@@ -1,4 +1,4 @@
-import TileManager from "@/resources/TileManager";
+import TileManager from "@/tiles/TileManager";
 import { EventEmitter } from "pixi.js";
 
 export default class TileMap extends EventEmitter<'tileChange'> {

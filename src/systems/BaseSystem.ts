@@ -23,8 +23,6 @@ export default abstract class BaseSystem extends ReactionSystem {
 
     constructor(query: Query | QueryBuilder | QueryPredicate) {
         super(query);
-
-        Game.instance.ecs.addSystem(this);
     }
 
     update(dt: number): void {
@@ -40,11 +38,12 @@ export default abstract class BaseSystem extends ReactionSystem {
         }
     }
 
-    protected abstract onUpdate(entity: Entity, dt: number): void | boolean;
-
+    protected onUpdate(entity: Entity, dt: number): void | boolean { }
     protected entityAdded = ({ current }: EntitySnapshot) => this.onEntityAdded(current);
     protected entityRemoved = ({ current }: EntitySnapshot) => this.onEntityRemoved(current);
 
+    // @ts-expect-error
     protected onEntityRemoved(entity: Entity): void { }
+    // @ts-expect-error
     protected onEntityAdded(entity: Entity): void { }
 }

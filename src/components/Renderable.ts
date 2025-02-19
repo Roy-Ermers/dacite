@@ -1,25 +1,19 @@
-import { AnimatedSprite, Container, Sprite, Texture } from "pixi.js";
+import { AnimatedSprite, Container, ContainerChild, Sprite } from "pixi.js";
 
-export default class Renderable {
-    public container: Container;
+export default class Renderable<T extends Container = Container<ContainerChild>> {
+    public container: T;
 
-    public constructor(public texture: Texture | Container | string) {
-        if (texture instanceof Container) {
-            this.container = texture;
+    public constructor(public texture: T) {
+        if (!(texture instanceof Container)) {
+            throw new Error('Invalid texture type');
+        }
+        this.container = texture;
 
-            if (texture instanceof AnimatedSprite)
-                texture.play();
-
-            return;
+        if (texture instanceof Sprite) {
+            texture.anchor.set(0.5);
         }
 
-
-
-        if (texture instanceof Texture || typeof texture === 'string') {
-            this.container = Sprite.from(texture);
-            return;
-        }
-
-        throw new Error('Invalid texture type');
+        if (texture instanceof AnimatedSprite)
+            texture.play();
     }
 }

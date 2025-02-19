@@ -1,7 +1,9 @@
 export default class Random {
     seed: number;
 
-    constructor(seed: number) {
+    constructor(seed?: number) {
+        seed = seed ?? Math.random();
+
         this.seed = seed % 2147483647;
 
         if (this.seed <= 0)

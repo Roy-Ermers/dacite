@@ -1,4 +1,4 @@
-import Tile from "./Tile";
+import Tile from "@/tiles/types/Tile";
 
 export default class TileManager {
     private static tiles: Tile[] = [];
@@ -7,19 +7,14 @@ export default class TileManager {
         return this.tiles[id] as T;
     }
 
-    public static getIdByTile(tile: Tile) {
-        return this.tiles.indexOf(tile);
-    }
-    public static getIdByName(tile: string) {
-        return this.tiles.findIndex(t => t.name === tile);
-    }
-
+    public static getId(tile: string): number;
+    public static getId(tile: Tile): number;
     public static getId(tile: Tile | string) {
         if (typeof tile === "string") {
-            return this.getIdByName(tile);
+            return this.tiles.findIndex(t => t.name === tile);
         }
 
-        return this.getIdByTile(tile);
+        return this.tiles.indexOf(tile);
     }
 
     public static register<T extends Tile>(tile: T) {

@@ -19,6 +19,7 @@
     }
   },
   "dependencies": {
+    "p2-es": "^1.2.3",
     "pixi.js": "^8.6.6",
     "tick-knock": "^4.3.0"
   }

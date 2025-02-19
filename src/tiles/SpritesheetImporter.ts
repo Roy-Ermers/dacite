@@ -9,7 +9,7 @@ export interface SpritesheetDefinition {
     alias?: Record<number, string>;
 
     animations?: {
-        [name: string]: number[];
+        [name: string]: number[] | string[];
     }
 }
 
@@ -56,7 +56,7 @@ export default class SpritesheetImporter {
     }
 
     public async build(): Promise<Spritesheet> {
-        const texture = await Assets.load<Texture>("tiles1.png");
+        const texture = await Assets.load<Texture>(this.texture);
         this.horizontalTiles = Math.floor(texture.width / this.data.tileWidth);
         this.verticalTiles = Math.floor(texture.height / this.data.tileHeight);
 

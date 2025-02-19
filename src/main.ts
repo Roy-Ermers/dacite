@@ -1,51 +1,74 @@
-import { AnimatedSprite, Assets, Sprite, Texture } from "pixi.js";
-import Game from "@/Game";
-import RenderSystem from "@/systems/RenderSystem";
-import { Entity } from "tick-knock";
 import Renderable from "@/components/Renderable";
-import Position from "@/components/Position";
+import TileMapRenderer from "@/components/TileMapRenderer";
+import createPlayer from "@/entities/Player";
+import Game from "@/Game";
 import TileMap from "@/grid/TileMap";
-import TileMapRenderer from "./components/TileMapRenderer";
-import SpritesheetImporter from "./resources/SpritesheetImporter";
-import TileManager from "./resources/TileManager";
-import TexturedTile from "./resources/TexturedTile";
+import Resources from "@/resources/Resources";
+import PlayerControllerSystem from "@/systems/PlayerControllerSystem";
+import RenderSystem from "@/systems/RenderSystem";
+import RigidbodySystem from "@/systems/RigidbodySystem";
+import TileManager from "@/tiles/TileManager";
+import TexturedTile from "@/tiles/types/TexturedTile";
+import { Sprite } from "pixi.js";
+import { Entity } from "tick-knock";
+import Collider from "./components/Collider";
+import BoxCollider from "./components/colliders/BoxCollider";
+import Rigidbody from "./components/Rigidbody";
+import Transform from "./components/Transform";
+import CameraSystem from "./systems/CameraSystem";
+import ColliderSystem from "./systems/ColliderSystem";
+import CollisionDebuggerSystem from "./systems/CollisionDebuggerSystem";
+import Vector2 from "./utils/Vector2";
 
 
 const game = new Game();
 await game.init();
 
-game.ecs.addSystem(new RenderSystem());
+await Resources.load();
+game.addSystem(
+    new RenderSystem,
+    new RigidbodySystem,
+    new PlayerControllerSystem,
+    new CameraSystem,
+    new ColliderSystem,
+    new CollisionDebuggerSystem
+);
 
-const spritesheet = await new SpritesheetImporter("tiles1.png", {
-  tileWidth: 16,
-  tileHeight: 16,
-  alias: {
-    1: "floor",
-    2: "moss",
-  }
-}).build();
-
-
-
-game.app.stage.scale.set(2);
-
-const tileMap = new TileMap(128, 128);
+TileManager.register(new TexturedTile('wall').setSolid());
 TileManager.register(new TexturedTile('floor'));
-TileManager.register(new TexturedTile('moss'));
+TileManager.register(new TexturedTile('floor_embers'));
+TileManager.register(new TexturedTile('floor_moss'));
 
-tileMap.setTile(0, 0, 1);
-tileMap.setTile(0, 2, 1);
-tileMap.setTile(0, 1, 2);
-const renderer = new TileMapRenderer(tileMap, spritesheet);
+const tileMap = new TileMap(64, 64);
+
+for (let x = 0; x < tileMap.width; x++) {
+    for (let y = 0; y < tileMap.height; y++) {
+        if (x === 0 || y === 0 || x === tileMap.width - 1 || y === tileMap.height - 1) {
+            tileMap.setTile(x, y, "wall");
+            continue;
+        }
+
+        if (Math.random() < 0.1)
+            tileMap.setTile(x, y, 'floor_embers');
+        else if (Math.random() < 0.2)
+            tileMap.setTile(x, y, 'floor_moss');
+        else
+            tileMap.setTile(x, y, 'floor');
+    }
+}
+
+const renderer = new TileMapRenderer(tileMap, Resources.TileSpritesheet);
 const tileMapEntity = new Entity()
-  .add(new Position(10, 10))
-  .add(renderer)
-  .add(new Renderable(renderer.container));
+    .add(renderer)
+    .add(new Renderable(renderer.container))
+    .add(new Transform());
 
-tileMapEntity.get(Renderable)!.container.on('click', () => {
-  console.log('click');
+const tile = new Entity()
+    .add(new Renderable(Sprite.from(Resources.TileSpritesheet.textures['wall'])))
+    .add(new Transform(new Vector2(-32, -32)))
+    .add(new Rigidbody({ type: "dynamic", mass: 10000 }))
+    .add(new BoxCollider(64, 16), Collider);
 
-  tileMap.setTile(0, 0, 2);
-})
-tileMapEntity.get(Renderable)!.container.eventMode = 'static';
+game.ecs.addEntity(tile);
 game.ecs.addEntity(tileMapEntity);
+game.ecs.addEntity(createPlayer());

@@ -1,5 +1,8 @@
-import { Application, SCALE_MODES, TextureSource } from "pixi.js";
+import { Application, TextureSource } from "pixi.js";
 import { Engine } from "tick-knock";
+import BaseSystem from "./systems/BaseSystem";
+import InputSystem from "./systems/InputSystem";
+import SpatialLookupSystem from "./systems/SpatialLookupSystem";
 
 export default class Game {
     public static instance: Game = null!;
@@ -33,21 +36,46 @@ export default class Game {
         globalThis.__ECS__ = this.ecs;
     }
 
+    addSystem(...systems: BaseSystem[]) {
+        for (const system of systems) {
+            this.ecs.addSystem(system);
+        }
+    }
+
+    removeSystem(system: BaseSystem) {
+        this.ecs.removeSystem(system);
+    }
+
+    getSystem<T extends BaseSystem>(system: new (...args: any[]) => T): T {
+        return this.ecs.getSystem(system) as T;
+    }
+
     async init() {
         await this.app.init({
             resizeTo: window,
-            antialias: false,
-            autoDensity: false,
+            autoDensity: true,
 
-            roundPixels: true,
+            // roundPixels: true,
             resolution: window.devicePixelRatio || 1,
             background: 0x000000,
+            powerPreference: "high-performance",
+
+            eventFeatures: {
+                globalMove: false,
+                move: false
+            }
         });
 
         this.timeStart = Date.now();
 
-        this.app.ticker.add((ticker) => this.ecs.update(ticker.deltaMS));
+        this.app.ticker.add((ticker) => this.ecs.update(1 / ticker.deltaMS));
+
+        this.ecs
+            .addSystem(new InputSystem)
+            .addSystem(new SpatialLookupSystem);
 
         document.body.appendChild(this.app.canvas);
+
+        this.app.canvas.focus();
     }
 }
