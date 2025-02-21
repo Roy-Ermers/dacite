@@ -1,4 +1,4 @@
-import Game from "@/Game";
+import Engine from "@/Engine";
 import { Entity, EntitySnapshot, Query, QueryBuilder, QueryPredicate, ReactionSystem } from "tick-knock";
 
 export default abstract class BaseSystem extends ReactionSystem {
@@ -11,13 +11,13 @@ export default abstract class BaseSystem extends ReactionSystem {
     public set disabled(value: boolean) {
         this._disabled = value;
 
-        const hasSystem = Game.instance.ecs.getSystem(this.constructor as any) === this;
+        const hasSystem = Engine.instance.ecs.getSystem(this.constructor as any) === this;
 
         if (value && hasSystem) {
-            Game.instance.ecs.removeSystem(this);
+            Engine.instance.ecs.removeSystem(this);
         }
         else if (!hasSystem) {
-            Game.instance.ecs.addSystem(this);
+            Engine.instance.ecs.addSystem(this);
         }
     }
 

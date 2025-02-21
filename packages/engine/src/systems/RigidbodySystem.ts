@@ -13,16 +13,14 @@ const TYPE_MAP: Record<RigidbodyType, 1 | 2 | 4> = {
 export default class RigidbodySystem extends BaseSystem {
     physicsWorld: World;
     fixedTimeStep: number = 1 / 60;
+    bodyLookup = new WeakMap<Body, Entity>();
 
     constructor() {
         super((entity) => entity.hasComponent(Rigidbody));
 
         this.physicsWorld = new World({
-            gravity: [0, 0]
+            gravity: [0, 0],
         });
-        this.physicsWorld.on("postStep", () => {
-            this.postUpdate();
-        })
     }
 
     update(dt: number): void {
@@ -30,30 +28,28 @@ export default class RigidbodySystem extends BaseSystem {
         super.update(dt);
     }
 
-    postUpdate() {
-        for (const entity of this.query.entities) {
-            const forces = entity.getAll(Force);
-            const rigidbody = entity.get(Rigidbody);
-            const transform = entity.get(Transform);
-            if (!rigidbody?.body || !transform) {
-                console.log("no rigidbody or transform", rigidbody, transform);
-                continue;
-            }
-
-            for (const force of forces) {
-                rigidbody.body.applyForce([force.direction.x, force.direction.y]);
-                entity.pick(force);
-            }
-
-
-            transform.position.x = rigidbody.body.interpolatedPosition[0];
-            transform.position.y = rigidbody.body.interpolatedPosition[1];
-            transform.rotation = rigidbody.body.interpolatedAngle;
+    protected onUpdate(entity: Entity): void | boolean {
+        const rigidbody = entity.get(Rigidbody);
+        const transform = entity.get(Transform);
+        if (!rigidbody?.body || !transform) {
+            console.log("no rigidbody or transform", rigidbody, transform);
+            return;
         }
-    }
 
-    protected onUpdate(entity: Entity, dt: number): void | boolean {
+        entity.iterate(Force, (force) => {
+            if (force.type === 'force')
+                rigidbody.body!.applyForce([...force.direction]);
+            if (force.type === 'impulse')
+                rigidbody.body!.applyImpulse([...force.direction]);
 
+            entity.pick(force);
+        });
+
+
+
+        transform.position.x = rigidbody.body.interpolatedPosition[0];
+        transform.position.y = rigidbody.body.interpolatedPosition[1];
+        transform.rotation = rigidbody.body.interpolatedAngle;
     }
 
     protected onEntityAdded(entity: Entity): void {
@@ -73,13 +69,18 @@ export default class RigidbodySystem extends BaseSystem {
             type: TYPE_MAP[rigidbody.type]
         });
 
+        this.bodyLookup.set(body, entity);
+
         this.physicsWorld.addBody(body);
         rigidbody.body = body;
     }
 
     protected onEntityRemoved(entity: Entity): void {
         const rigidbody = entity.get(Rigidbody);
-        if (rigidbody?.body)
-            this.physicsWorld.removeBody(rigidbody.body);
+        if (!rigidbody?.body)
+            return;
+
+        this.bodyLookup.delete(rigidbody?.body);
+        this.physicsWorld.removeBody(rigidbody.body);
     }
 }

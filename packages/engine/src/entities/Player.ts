@@ -1,6 +1,6 @@
 import Animator from "@/components/Animator";
-import Collider from "@/components/Collider";
 import CircleCollider from "@/components/colliders/CircleCollider";
+import Collider from "@/components/colliders/Collider";
 import Controller from "@/components/Controller";
 import { Name } from "@/components/Name";
 import Renderable from "@/components/Renderable";
@@ -15,7 +15,7 @@ export default function createPlayer() {
         .addComponent(new Transform())
         .addComponent(new Rigidbody({ mass: 85, fixedRotation: true }))
         .addComponent(new CircleCollider(8), Collider)
-        .addComponent(new Controller(17000))
+        .addComponent(new Controller(340))
         .addComponent(new Name("player"))
         .addTag(PlAYER_CONTROLLER)
         .addTag(CAMERA_FOCUS)

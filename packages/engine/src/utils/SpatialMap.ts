@@ -129,7 +129,7 @@ export default class SpatialMap {
         entities.push(...this.buckets.get(maxHash) ?? []);
 
         if (Math.abs(min.x - max.x) > 128 || Math.abs(min.x - max.x) > 128) {
-            let j = min.copy();
+            let j = min.clone();
 
             const [stepsX, stepsY] = [Math.ceil(Math.abs(min.x - max.x) / this.resulution), Math.ceil(Math.abs(min.y - max.y) / this.resulution)];
 

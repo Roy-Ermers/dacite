@@ -1,6 +1,6 @@
 import { CAMERA_FOCUS } from "@/components/Tags";
 import Transform from "@/components/Transform";
-import Game from "@/Game";
+import Engine from "@/Engine";
 import lerp from "@/utils/Lerp";
 import Vector2 from "@/utils/Vector2";
 import type { Entity } from "tick-knock";
@@ -21,7 +21,7 @@ export default class CameraSystem extends BaseSystem {
         const transform = entity.get(Transform);
 
         if (!transform) return;
-        const stage = Game.instance.app.stage;
+        const stage = Engine.instance.app.stage;
 
         this.targetZoom = Math.max(Math.abs(this.targetZoom + InputSystem.instance.wheel), 0.1);
 
@@ -35,8 +35,8 @@ export default class CameraSystem extends BaseSystem {
         this.currentPosition = this.currentPosition.lerp(transform.position, (distance / this.speed) * dt);
 
         stage.position.set(
-            (Game.instance.app.screen.width / 2 - this.currentPosition.x * this.currentZoom),
-            (Game.instance.app.screen.height / 2 - this.currentPosition.y * this.currentZoom)
+            (Engine.instance.app.screen.width / 2 - this.currentPosition.x * this.currentZoom),
+            (Engine.instance.app.screen.height / 2 - this.currentPosition.y * this.currentZoom)
         );
     }
 }

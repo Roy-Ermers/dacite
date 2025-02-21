@@ -1,11 +1,12 @@
 import { Application, TextureSource } from "pixi.js";
-import { Engine } from "tick-knock";
+import { Engine as EcsEngine } from "tick-knock";
+import Entity from "./entities/Entity";
 import BaseSystem from "./systems/BaseSystem";
 import InputSystem from "./systems/InputSystem";
 import SpatialLookupSystem from "./systems/SpatialLookupSystem";
 
-export default class Game {
-    public static instance: Game = null!;
+export default class Engine {
+    public static instance: Engine = null!;
     public get ticker() {
         return this.app.ticker;
     }
@@ -15,18 +16,17 @@ export default class Game {
     }
 
     public readonly app: Application;
-    public readonly ecs = new Engine();
+    public readonly ecs = new EcsEngine();
 
     private timeStart: number = 0;
 
     constructor() {
-        if (Game.instance) {
+        if (Engine.instance) {
             throw new Error("Game is already instantiated");
         }
 
-        Game.instance = this;
+        Engine.instance = this;
         this.app = new Application();
-        this.ecs = new Engine();
 
         TextureSource.defaultOptions.scaleMode = "nearest";
 
@@ -48,6 +48,12 @@ export default class Game {
 
     getSystem<T extends BaseSystem>(system: new (...args: any[]) => T): T {
         return this.ecs.getSystem(system) as T;
+    }
+
+    createEntity(name: string) {
+        const entity = new Entity(name);
+        this.ecs.addEntity(entity.ecsEntity);
+        return entity;
     }
 
     async init() {

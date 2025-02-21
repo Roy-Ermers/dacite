@@ -1,26 +1,9 @@
 {
-  "name": "artifact-hunt",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "gl": "^8.1.6",
-    "typescript": "~5.6.2",
-    "vite": "^6.0.1"
-  },
-  "overrides": {
-    "pixijs": {
-      "gl": "latest"
-    }
-  },
-  "dependencies": {
-    "p2-es": "^1.2.3",
-    "pixi.js": "^8.6.6",
-    "tick-knock": "^4.3.0"
-  }
+    "name": "@scout/monorepo",
+    "scripts": {
+        "dev": "npm run -w=@scout/playground dev"
+    },
+    "workspaces": [
+        "packages/*"
+    ]
 }

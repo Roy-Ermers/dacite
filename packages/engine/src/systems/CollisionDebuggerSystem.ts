@@ -1,9 +1,8 @@
-import Game from "@/Game";
-import Collider from "@/components/Collider";
-import Rigidbody from "@/components/Rigidbody";
+import Engine from "@/Engine";
 import Transform from "@/components/Transform";
 import BoxCollider from "@/components/colliders/BoxCollider";
 import CircleCollider from "@/components/colliders/CircleCollider";
+import Collider from "@/components/colliders/Collider";
 import { Container, Graphics } from "pixi.js";
 import { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
@@ -19,11 +18,17 @@ export default class CollisionDebuggerSystem extends BaseSystem {
         super(entity => entity.hasComponent(Collider));
         this.graphics = new Container();
         this.graphics.zIndex = 1000;
+        this.graphics.label = "Collision Debugger";
     }
 
     onAddedToEngine(): void {
         super.onAddedToEngine();
-        Game.instance.app.stage.addChild(this.graphics);
+        Engine.instance.app.stage.addChild(this.graphics);
+    }
+
+    onRemovedFromEngine(): void {
+        super.onRemovedFromEngine();
+        Engine.instance.app.stage.removeChild(this.graphics);
     }
 
     update(dt: number): void {
@@ -33,10 +38,6 @@ export default class CollisionDebuggerSystem extends BaseSystem {
     protected onUpdate(entity: Entity, dt: number): void | boolean {
         const collider = entity.get(Collider)!;
         const transform = entity.get(Transform)!;
-        const rigidbody = entity.get(Rigidbody)!;
-
-        if (!rigidbody.body)
-            return;
 
         const graphics = this.colliderDrawer.get(collider)!;
         graphics.position.set(transform.position.x, transform.position.y);
@@ -45,7 +46,6 @@ export default class CollisionDebuggerSystem extends BaseSystem {
 
     protected onEntityAdded(entity: Entity): void {
         const collider = entity.get(Collider)!;
-        const transform = entity.get(Transform)!;
 
         const graphics = new Graphics();
         graphics.strokeStyle = { color: 0xff0000, pixelLine: true };

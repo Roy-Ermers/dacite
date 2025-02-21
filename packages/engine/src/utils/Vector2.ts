@@ -38,8 +38,14 @@ export default class Vector2 {
 
     constructor(public x: number = 0, public y: number = 0) { }
 
-    lerp(target: Vector2, amount: number) {
-        return new Vector2(
+    *[Symbol.iterator]() {
+        yield this.x;
+        yield this.y;
+    }
+
+    lerp(target: Vector2, amount: number, dest?: Vector2) {
+        dest ??= new Vector2();
+        return dest.set(
             lerp(this.x, target.x, amount),
             lerp(this.y, target.y, amount)
         );
@@ -65,19 +71,21 @@ export default class Vector2 {
         return this.multiply(-1);
     }
 
-    rotate(degrees: number) {
+    rotate(degrees: number, dest?: Vector2) {
+        dest ??= new Vector2();
         const radials = degrees * DEGREE_TO_RADIAL;
 
-        return new Vector2(
+        return dest.set(
             this.x * Math.cos(radials) - this.y * Math.sin(radials),
             this.x * Math.sin(radials) + this.y * Math.cos(radials),
         );
     }
 
-    normalize() {
+    normalize(dest?: Vector2) {
+        dest ??= new Vector2();
         if (this.length == 0)
             return this;
-        return this.divide(this.length);
+        return this.divide(this.length, this.length, dest);
     }
 
     limit(limit: number = 1) {
@@ -89,15 +97,17 @@ export default class Vector2 {
 
     multiply(x: number): Vector2;
     multiply(x: number, y: number): Vector2;
+    multiply(x: number, y: number, destination: Vector2): Vector2;
     multiply(vector: Vector2): Vector2;
-    multiply(vector: number | Vector2, y?: number) {
+    multiply(vector: number | Vector2, y?: number, dest?: Vector2) {
+        dest ??= new Vector2();
         if (vector instanceof Vector2)
-            return new Vector2(
+            return dest.set(
                 this.x * vector.x,
                 this.y * vector.y
             );
 
-        return new Vector2(
+        return dest.set(
             this.x * vector,
             this.y * (y ?? vector)
         );
@@ -105,15 +115,17 @@ export default class Vector2 {
 
     divide(x: number): Vector2;
     divide(x: number, y: number): Vector2;
+    divide(x: number, y: number, destination: Vector2): Vector2;
     divide(vector: Vector2): Vector2;
-    divide(vector: number | Vector2, y?: number) {
+    divide(vector: number | Vector2, y?: number, dest?: Vector2) {
+        dest ??= new Vector2();
         if (vector instanceof Vector2)
-            return new Vector2(
+            return dest.set(
                 this.x / vector.x,
                 this.y / vector.y
             );
 
-        return new Vector2(
+        return dest.set(
             this.x / vector,
             this.y / (y ?? vector)
         );
@@ -121,15 +133,17 @@ export default class Vector2 {
 
     add(x: number): Vector2;
     add(x: number, y: number): Vector2;
+    add(x: number, y: number, destination: Vector2): Vector2;
     add(vector: Vector2): Vector2;
-    add(vector: number | Vector2, y?: number) {
+    add(vector: number | Vector2, y?: number, dest?: Vector2) {
+        dest ??= new Vector2();
         if (vector instanceof Vector2)
-            return new Vector2(
+            return dest.set(
                 this.x + vector.x,
                 this.y + vector.y
             );
 
-        return new Vector2(
+        return dest.set(
             this.x + vector,
             this.y + (y ?? vector)
         );
@@ -137,22 +151,28 @@ export default class Vector2 {
 
     subtract(x: number): Vector2;
     subtract(x: number, y: number): Vector2;
+    subtract(x: number, y: number, destination: Vector2): Vector2;
     subtract(vector: Vector2): Vector2;
-    subtract(vector: number | Vector2, y?: number) {
+    subtract(vector: number | Vector2, y?: number, dest?: Vector2) {
+        dest ??= new Vector2();
         if (vector instanceof Vector2)
-            return new Vector2(
+            return dest.set(
                 this.x - vector.x,
                 this.y - vector.y
             );
 
-        return new Vector2(
+        return dest.set(
             this.x - vector,
             this.y - (y ?? vector)
         );
     }
 
-    reflect(normal: Vector2) {
-        return this.subtract(normal.multiply(2 * this.dot(normal)));
+    reflect(normal: Vector2, dest?: Vector2) {
+        dest ??= new Vector2();
+        const normalDot = 2 * this.dot(normal);
+        const subtract = normal.multiply(normalDot, normalDot, dest);
+
+        return this.subtract(subtract.x, subtract.y, dest);
     }
 
     set(x: number, y: number) {
@@ -169,7 +189,7 @@ export default class Vector2 {
         );
     }
 
-    copy() {
+    clone() {
         return new Vector2(
             this.x,
             this.y

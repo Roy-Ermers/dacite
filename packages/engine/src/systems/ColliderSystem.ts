@@ -1,6 +1,6 @@
-import Collider from "@/components/Collider";
 import BoxCollider from "@/components/colliders/BoxCollider";
 import CircleCollider from "@/components/colliders/CircleCollider";
+import Collider from "@/components/colliders/Collider";
 import Rigidbody from "@/components/Rigidbody";
 import { Box, Circle } from "p2-es";
 import type { Entity } from "tick-knock";

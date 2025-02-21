@@ -3,7 +3,7 @@ import { Sprite, type Container } from "pixi.js";
 import { Entity } from "tick-knock";
 import Renderable from "../components/Renderable";
 import Transform from "../components/Transform";
-import Game from "../Game";
+import Engine from "../Engine";
 import BaseSystem from "./BaseSystem";
 
 export default class RenderSystem extends BaseSystem {
@@ -25,7 +25,7 @@ export default class RenderSystem extends BaseSystem {
         const renderable = entity.get(Renderable)!;
 
 
-        const sprite = Game.instance.app.stage.addChild(renderable.container as Sprite);
+        const sprite = Engine.instance.app.stage.addChild(renderable.container as Sprite);
         const name = entity.get(Name);
         if (name) {
             sprite.label = name.name;
@@ -35,6 +35,6 @@ export default class RenderSystem extends BaseSystem {
     protected onEntityRemoved(entity: Entity) {
         const renderable = entity.get(Renderable)!;
 
-        Game.instance.app.stage.removeChild(renderable.container);
+        Engine.instance.app.stage.removeChild(renderable.container);
     }
 }

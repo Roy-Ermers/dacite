@@ -1,4 +1,4 @@
-import Collider from "@/components/Collider";
+import Collider from "@/components/colliders/Collider";
 
 export default class BoxCollider extends Collider {
     get lookupRadius(): number {

@@ -12,6 +12,7 @@ import BaseSystem from "./BaseSystem";
 
 export default class PlayerControllerSystem extends BaseSystem {
     random: Random;
+
     constructor() {
         super((entity) => entity.hasTag(PlAYER_CONTROLLER) && entity.hasComponent(Rigidbody));
         this.random = new Random();
@@ -40,14 +41,15 @@ export default class PlayerControllerSystem extends BaseSystem {
         }
 
 
-        entity.append(new Force(direction.normalize().multiply(controller.speed)));
+        entity.append(new Force(direction.normalize().multiply(controller.speed), "impulse"));
 
         const rigidbody = entity.get(Rigidbody);
         if (!animator || !rigidbody) return;
 
-        animator.flipped = rigidbody.velocity.x < 0;
+        if (direction.x != 0) animator.flipped = direction.x < 0;
 
-        if (Math.round(rigidbody.velocity.x) !== 0 || Math.round(rigidbody.velocity.y) !== 0) {
+
+        if ((rigidbody.velocity.x | 0) !== 0 || (rigidbody.velocity.y | 0) !== 0) {
             animator.currentStateKey = "walk";
         } else {
             if (this.random.value > 0.995) {
