@@ -1,14 +1,8 @@
-import Animator from "@/components/Animator";
-import CircleCollider from "@/components/colliders/CircleCollider";
-import Collider from "@/components/colliders/Collider";
-import Controller from "@/components/Controller";
-import { Name } from "@/components/Name";
-import Renderable from "@/components/Renderable";
-import Rigidbody from "@/components/Rigidbody";
-import { CAMERA_FOCUS, PlAYER_CONTROLLER } from "@/components/Tags";
-import Transform from "@/components/Transform";
-import Resources from "@/resources/Resources";
+import { Animator, CircleCollider, Collider, Controller, Renderable, Rigidbody, Transform } from "@scout/engine/components/index.ts";
+import { CAMERA_FOCUS } from "@scout/engine/components/Tags.ts";
 import { Entity } from "tick-knock";
+import PLAYER_CONTROLLER from "../components/PlayerController";
+import Resources from "../resources/Resources.ts";
 
 export default function createPlayer() {
     const player = new Entity()
@@ -16,8 +10,7 @@ export default function createPlayer() {
         .addComponent(new Rigidbody({ mass: 85, fixedRotation: true }))
         .addComponent(new CircleCollider(8), Collider)
         .addComponent(new Controller(340))
-        .addComponent(new Name("player"))
-        .addTag(PlAYER_CONTROLLER)
+        .addTag(PLAYER_CONTROLLER)
         .addTag(CAMERA_FOCUS)
         .addComponent(new Animator({
             spriteSheet: Resources.PlayerSpritesheet,

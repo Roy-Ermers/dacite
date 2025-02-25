@@ -1,5 +1,5 @@
-import Transform from "@/components/Transform";
-import SpatialMap from "@/utils/SpatialMap";
+import Transform from "@scout/engine/components/Transform.ts";
+import SpatialMap from "@scout/engine/utils/SpatialMap.ts";
 import type { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
 
@@ -13,7 +13,7 @@ export default class SpatialLookupSystem extends BaseSystem {
         (globalThis as any).__SPATIAL_MAP__ = this.spatialMap;
     }
 
-    protected onUpdate(entity: Entity, dt: number): void | boolean {
+    protected override onUpdate(entity: Entity): void | boolean {
         this.spatialMap.set(entity);
     }
 }

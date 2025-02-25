@@ -1,5 +1,5 @@
-import Renderable from "@/components/Renderable";
-import Transform from "@/components/Transform";
+import Renderable from "@scout/engine/components/Renderable.ts";
+import Transform from "@scout/engine/components/Transform.ts";
 import type { Container } from "pixi.js";
 import type { Entity } from "tick-knock";
 import MathExtensions from "./MathExtensions";

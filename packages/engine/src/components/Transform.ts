@@ -1,4 +1,4 @@
-import Vector2 from "@/utils/Vector2";
+import Vector2 from "@scout/engine/utils/Vector2.ts";
 
 export default class Transform {
     public constructor(public position: Vector2 = Vector2.zero, public rotation: number = 0) { }

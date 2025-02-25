@@ -1,4 +1,4 @@
-import SpritesheetImporter from "@/tiles/SpritesheetImporter";
+import SpritesheetImporter from "@scout/engine/tiles/SpritesheetImporter.ts";
 import { Spritesheet } from "pixi.js";
 
 export default class Resources {

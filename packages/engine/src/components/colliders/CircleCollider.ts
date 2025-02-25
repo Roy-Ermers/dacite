@@ -1,4 +1,4 @@
-import Collider from "@/components/colliders/Collider";
+import Collider from "@scout/engine/components/colliders/Collider.ts";
 
 export default class CircleCollider extends Collider {
     get lookupRadius(): number {

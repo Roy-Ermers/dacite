@@ -1,39 +1,43 @@
 {
   "compilerOptions": {
-    "target": "esnext",
     "useDefineForClassFields": false,
-    "module": "ESNext",
+    "target": "esnext",
+    "module": "esnext",
     "baseUrl": ".",
-    "rootDir": ".",
     "lib": [
       "ESNext",
       "DOM",
       "DOM.Iterable"
     ],
-    "skipLibCheck": true,
-    "stripInternal": true,
+    "customConditions": [
+      "source"
+    ],
+    "paths": {
+      "@scout/engine": [
+        "packages/engine/src"
+      ],
+      "@scout/playground": [
+        "packages/playground/src"
+      ],
+    },
 
     /* Bundler mode */
+    "declaration": true,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
     "noEmit": true,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true,
 
     /* Linting */
     "strict": true,
+    "stripInternal": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "paths": {
-      "@scout/*": [
-        "./packages/*/src"
-      ]
-    },
-    "composite": true
+    "noImplicitOverride": true,
   },
   "include": [
-    "packages/*/src"
+    "packages/**/*.ts"
   ]
 }

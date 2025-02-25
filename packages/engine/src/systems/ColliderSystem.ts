@@ -1,7 +1,7 @@
-import BoxCollider from "@/components/colliders/BoxCollider";
-import CircleCollider from "@/components/colliders/CircleCollider";
-import Collider from "@/components/colliders/Collider";
-import Rigidbody from "@/components/Rigidbody";
+import BoxCollider from "@scout/engine/components/colliders/BoxCollider.ts";
+import CircleCollider from "@scout/engine/components/colliders/CircleCollider.ts";
+import Collider from "@scout/engine/components/colliders/Collider.ts";
+import Rigidbody from "@scout/engine/components/Rigidbody.ts";
 import { Box, Circle } from "p2-es";
 import type { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
@@ -11,7 +11,8 @@ export default class ColliderSystem extends BaseSystem {
         super(entity => entity.hasAll(Rigidbody, Collider));
     }
 
-    protected onEntityAdded(entity: Entity): void {
+
+    protected override onEntityAdded(entity: Entity): void {
         const collider = entity.get(Collider)!;
         const rigidbody = entity.get(Rigidbody)!;
 

@@ -1,8 +1,8 @@
-import Engine from "@/Engine";
-import Transform from "@/components/Transform";
-import BoxCollider from "@/components/colliders/BoxCollider";
-import CircleCollider from "@/components/colliders/CircleCollider";
-import Collider from "@/components/colliders/Collider";
+import Engine from "@scout/engine";
+import Transform from "@scout/engine/components/Transform.ts";
+import BoxCollider from "@scout/engine/components/colliders/BoxCollider.ts";
+import CircleCollider from "@scout/engine/components/colliders/CircleCollider.ts";
+import Collider from "@scout/engine/components/colliders/Collider.ts";
 import { Container, Graphics } from "pixi.js";
 import { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
@@ -21,21 +21,21 @@ export default class CollisionDebuggerSystem extends BaseSystem {
         this.graphics.label = "Collision Debugger";
     }
 
-    onAddedToEngine(): void {
+    override onAddedToEngine(): void {
         super.onAddedToEngine();
         Engine.instance.app.stage.addChild(this.graphics);
     }
 
-    onRemovedFromEngine(): void {
+    override onRemovedFromEngine(): void {
         super.onRemovedFromEngine();
         Engine.instance.app.stage.removeChild(this.graphics);
     }
 
-    update(dt: number): void {
+    override update(dt: number): void {
         super.update(dt);
     }
 
-    protected onUpdate(entity: Entity, dt: number): void | boolean {
+    protected override onUpdate(entity: Entity): void | boolean {
         const collider = entity.get(Collider)!;
         const transform = entity.get(Transform)!;
 
@@ -44,7 +44,7 @@ export default class CollisionDebuggerSystem extends BaseSystem {
         graphics.rotation = transform.rotation;
     }
 
-    protected onEntityAdded(entity: Entity): void {
+    protected override onEntityAdded(entity: Entity): void {
         const collider = entity.get(Collider)!;
 
         const graphics = new Graphics();
@@ -66,7 +66,7 @@ export default class CollisionDebuggerSystem extends BaseSystem {
         }
     }
 
-    protected onEntityRemoved(entity: Entity): void {
+    protected override onEntityRemoved(entity: Entity): void {
         const collider = entity.get(Collider)!;
         const graphics = this.colliderDrawer.get(collider)!;
         this.graphics.removeChild(graphics);

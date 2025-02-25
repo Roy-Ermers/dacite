@@ -1,9 +1,10 @@
+import Entity from "@scout/engine/entities/Entity.ts";
+import BaseSystem from "@scout/engine/systems/BaseSystem.ts";
+import InputSystem from "@scout/engine/systems/InputSystem.ts";
+import SpatialLookupSystem from "@scout/engine/systems/SpatialLookupSystem.ts";
 import { Application, TextureSource } from "pixi.js";
 import { Engine as EcsEngine } from "tick-knock";
-import Entity from "./entities/Entity";
-import BaseSystem from "./systems/BaseSystem";
-import InputSystem from "./systems/InputSystem";
-import SpatialLookupSystem from "./systems/SpatialLookupSystem";
+import RenderSystem from "./systems/RenderSystem";
 
 export default class Engine {
     public static instance: Engine = null!;
@@ -77,6 +78,7 @@ export default class Engine {
         this.app.ticker.add((ticker) => this.ecs.update(1 / ticker.deltaMS));
 
         this.ecs
+            .addSystem(new RenderSystem)
             .addSystem(new InputSystem)
             .addSystem(new SpatialLookupSystem);
 

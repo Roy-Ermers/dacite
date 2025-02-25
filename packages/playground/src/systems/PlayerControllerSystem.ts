@@ -1,24 +1,24 @@
-import Animator from "@/components/Animator";
-import Controller from "@/components/Controller";
-import Force from "@/components/Force";
-import Renderable from "@/components/Renderable";
-import Rigidbody from "@/components/Rigidbody";
-import { PlAYER_CONTROLLER } from "@/components/Tags";
-import InputSystem from "@/systems/InputSystem";
-import Random from "@/utils/Random";
-import Vector2 from "@/utils/Vector2";
+import Animator from "@scout/engine/components/Animator.ts";
+import Controller from "@scout/engine/components/Controller.ts";
+import Force from "@scout/engine/components/Force.js";
+import Renderable from "@scout/engine/components/Renderable.ts";
+import Rigidbody from "@scout/engine/components/Rigidbody.ts";
+import BaseSystem from "@scout/engine/systems/BaseSystem.ts";
+import InputSystem from "@scout/engine/systems/InputSystem.ts";
+import Random from "@scout/engine/utils/Random.ts";
+import Vector2 from "@scout/engine/utils/Vector2.ts";
 import { Entity } from "tick-knock";
-import BaseSystem from "./BaseSystem";
+import PLAYER_CONTROLLER from "../components/PlayerController.ts";
 
 export default class PlayerControllerSystem extends BaseSystem {
     random: Random;
 
     constructor() {
-        super((entity) => entity.hasTag(PlAYER_CONTROLLER) && entity.hasComponent(Rigidbody));
+        super((entity: Entity) => entity.hasTag(PLAYER_CONTROLLER) && entity.hasComponent(Rigidbody));
         this.random = new Random();
     }
 
-    protected onUpdate(entity: Entity): void | boolean {
+    protected override onUpdate(entity: Entity): void | boolean {
         const controller = entity.get(Controller);
         const animator = entity.get(Renderable) as Animator;
 

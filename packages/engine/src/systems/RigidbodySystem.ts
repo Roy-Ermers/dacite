@@ -1,6 +1,6 @@
-import Force from "@/components/Force";
-import Rigidbody, { type RigidbodyType } from "@/components/Rigidbody";
-import Transform from "@/components/Transform";
+import Force from "@scout/engine/components/Force.ts";
+import Rigidbody, { type RigidbodyType } from "@scout/engine/components/Rigidbody.ts";
+import Transform from "@scout/engine/components/Transform.ts";
 import { Body, World } from "p2-es";
 import { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
@@ -10,9 +10,11 @@ const TYPE_MAP: Record<RigidbodyType, 1 | 2 | 4> = {
     "static": Body.STATIC,
     "kinematic": Body.KINEMATIC
 } as const
+
 export default class RigidbodySystem extends BaseSystem {
     physicsWorld: World;
     fixedTimeStep: number = 1 / 60;
+    // TODO: Use a weakmap to create bodies for entities
     bodyLookup = new WeakMap<Body, Entity>();
 
     constructor() {
@@ -23,12 +25,12 @@ export default class RigidbodySystem extends BaseSystem {
         });
     }
 
-    update(dt: number): void {
+    override update(dt: number): void {
         this.physicsWorld.step(this.fixedTimeStep, dt, 10);
         super.update(dt);
     }
 
-    protected onUpdate(entity: Entity): void | boolean {
+    protected override onUpdate(entity: Entity): void | boolean {
         const rigidbody = entity.get(Rigidbody);
         const transform = entity.get(Transform);
         if (!rigidbody?.body || !transform) {
@@ -52,7 +54,7 @@ export default class RigidbodySystem extends BaseSystem {
         transform.rotation = rigidbody.body.interpolatedAngle;
     }
 
-    protected onEntityAdded(entity: Entity): void {
+    protected override onEntityAdded(entity: Entity): void {
         const rigidbody = entity.get(Rigidbody);
         const transform = entity.get(Transform);
 
@@ -75,7 +77,7 @@ export default class RigidbodySystem extends BaseSystem {
         rigidbody.body = body;
     }
 
-    protected onEntityRemoved(entity: Entity): void {
+    protected override onEntityRemoved(entity: Entity): void {
         const rigidbody = entity.get(Rigidbody);
         if (!rigidbody?.body)
             return;

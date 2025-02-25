@@ -1,4 +1,4 @@
-import Engine from "@/Engine";
+import Engine from "@scout/engine";
 import { Entity, EntitySnapshot, Query, QueryBuilder, QueryPredicate, ReactionSystem } from "tick-knock";
 
 export default abstract class BaseSystem extends ReactionSystem {
@@ -25,7 +25,11 @@ export default abstract class BaseSystem extends ReactionSystem {
         super(query);
     }
 
-    update(dt: number): void {
+    override update(dt: number): void {
+        if (this.onUpdate === undefined) {
+            return;
+        }
+
         let requestRemoval = false;
         for (const entity of this.query.entities) {
             if (this.onUpdate(entity, dt)) {
@@ -38,9 +42,9 @@ export default abstract class BaseSystem extends ReactionSystem {
         }
     }
 
-    protected onUpdate(entity: Entity, dt: number): void | boolean { }
-    protected entityAdded = ({ current }: EntitySnapshot) => this.onEntityAdded(current);
-    protected entityRemoved = ({ current }: EntitySnapshot) => this.onEntityRemoved(current);
+    protected onUpdate?(entity: Entity, dt: number): void | boolean;
+    protected override entityAdded = ({ current }: EntitySnapshot) => this.onEntityAdded(current);
+    protected override entityRemoved = ({ current }: EntitySnapshot) => this.onEntityRemoved(current);
 
     // @ts-expect-error
     protected onEntityRemoved(entity: Entity): void { }

@@ -1,30 +1,25 @@
-import Game from "@scout/engine";
-import BoxCollider from "@scout/engine/components/colliders/BoxCollider.ts";
-import Collider from "@scout/engine/components/colliders/Collider.ts";
-import Renderable from "@scout/engine/components/Renderable.ts";
-import Rigidbody from "@scout/engine/components/Rigidbody.ts";
-import Transform from "@scout/engine/components/Transform.ts";
-import createPlayer from "@scout/engine/entities/Player.ts";
-import Resources from "@scout/engine/resources/Resources.ts";
+import Game, { BoxCollider, Collider, Renderable, Rigidbody, Transform } from "@scout/engine";
 import CameraSystem from "@scout/engine/systems/CameraSystem.ts";
 import ColliderSystem from "@scout/engine/systems/ColliderSystem.ts";
 import CollisionDebuggerSystem from "@scout/engine/systems/CollisionDebuggerSystem.ts";
-import PlayerControllerSystem from "@scout/engine/systems/PlayerControllerSystem.ts";
-import RenderSystem from "@scout/engine/systems/RenderSystem.ts";
 import RigidbodySystem from "@scout/engine/systems/RigidbodySystem.ts";
 import TileManager from "@scout/engine/tiles/TileManager.ts";
 import TexturedTile from "@scout/engine/tiles/types/TexturedTile.ts";
 import Vector2 from "@scout/engine/utils/Vector2.ts";
+import createPlayer from "./entities/Player";
+import Resources from "./resources/Resources.ts";
+import PlayerControllerSystem from "./systems/PlayerControllerSystem";
 
 import { Sprite } from "pixi.js";
 import { Entity } from "tick-knock";
+
 const game = new Game();
+
 async function init() {
     await game.init();
 
     await Resources.load();
     game.addSystem(
-        new RenderSystem,
         new RigidbodySystem,
         new PlayerControllerSystem,
         new CameraSystem,

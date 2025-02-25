@@ -1,4 +1,3 @@
-import { Name } from "@/components/Name";
 import { Sprite, type Container } from "pixi.js";
 import { Entity } from "tick-knock";
 import Renderable from "../components/Renderable";
@@ -11,7 +10,7 @@ export default class RenderSystem extends BaseSystem {
         super((entity) => entity.has(Renderable));
     }
 
-    protected onUpdate(entity: Entity): void {
+    protected override onUpdate(entity: Entity): void {
         const transform = entity.get(Transform);
         const renderable = entity.get<Renderable<Container>>(Renderable)!;
 
@@ -21,18 +20,13 @@ export default class RenderSystem extends BaseSystem {
         }
     }
 
-    protected onEntityAdded(entity: Entity) {
+    protected override onEntityAdded(entity: Entity) {
         const renderable = entity.get(Renderable)!;
 
-
-        const sprite = Engine.instance.app.stage.addChild(renderable.container as Sprite);
-        const name = entity.get(Name);
-        if (name) {
-            sprite.label = name.name;
-        }
+        Engine.instance.app.stage.addChild(renderable.container as Sprite);
     }
 
-    protected onEntityRemoved(entity: Entity) {
+    protected override onEntityRemoved(entity: Entity) {
         const renderable = entity.get(Renderable)!;
 
         Engine.instance.app.stage.removeChild(renderable.container);

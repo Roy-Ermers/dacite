@@ -3,23 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "src/Game.ts",
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly"
   },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "main": "./src/Engine.ts",
   "files": [
     "src"
   ],
-  "exports": {
-    ".": {
-      "source": "./src/Engine.ts",
-      "import": "./dist/engine.js",
-      "types": "./dist/Engine.d.ts"
-    },
-    "./*": {
-      "source": "./src/*"
-    }
-  },
   "devDependencies": {
     "gl": "^8.1.6",
     "typescript": "~5.6.2",

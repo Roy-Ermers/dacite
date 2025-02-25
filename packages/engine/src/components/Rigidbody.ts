@@ -1,4 +1,4 @@
-import Vector2 from "@/utils/Vector2";
+import Vector2 from "@scout/engine/utils/Vector2";
 import type { Body } from "p2-es";
 
 export type RigidbodyType = |

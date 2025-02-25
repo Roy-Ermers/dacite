@@ -2,7 +2,7 @@ import { System } from "tick-knock";
 
 export default class InputSystem extends System {
     private static _instance: InputSystem;
-    get priority(): number {
+    override get priority(): number {
         return 100;
     }
     public static get instance() {
@@ -77,7 +77,7 @@ export default class InputSystem extends System {
         return !keys.some(x => !this.currentFrame.has(x));
     }
 
-    public update() {
+    public override update() {
         this.currentFrame.clear();
         this.wheel = 0;
     }

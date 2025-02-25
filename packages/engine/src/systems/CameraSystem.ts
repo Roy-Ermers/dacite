@@ -1,8 +1,8 @@
-import { CAMERA_FOCUS } from "@/components/Tags";
-import Transform from "@/components/Transform";
-import Engine from "@/Engine";
-import lerp from "@/utils/Lerp";
-import Vector2 from "@/utils/Vector2";
+import Engine from "@scout/engine";
+import { CAMERA_FOCUS } from "@scout/engine/components/Tags.ts";
+import Transform from "@scout/engine/components/Transform.ts";
+import lerp from "@scout/engine/utils/Lerp.ts";
+import Vector2 from "@scout/engine/utils/Vector2.ts";
 import type { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
 import InputSystem from "./InputSystem";
@@ -17,7 +17,7 @@ export default class CameraSystem extends BaseSystem {
         super(entity => entity.hasTag(CAMERA_FOCUS));
     }
 
-    protected onUpdate(entity: Entity, dt: number): void | boolean {
+    protected override onUpdate(entity: Entity, dt: number): void | boolean {
         const transform = entity.get(Transform);
 
         if (!transform) return;

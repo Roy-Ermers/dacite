@@ -1,6 +1,6 @@
-import TileMap from "@/grid/TileMap";
-import TileManager from "@/tiles/TileManager";
-import TexturedTile from "@/tiles/types/TexturedTile";
+import TileMap from "@scout/engine/grid/TileMap.ts";
+import TileManager from "@scout/engine/tiles/TileManager.ts";
+import TexturedTile from "@scout/engine/tiles/types/TexturedTile.ts";
 import { Container, Sprite, Spritesheet } from "pixi.js";
 
 export default class TileMapRenderer {
