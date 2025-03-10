@@ -1,0 +1,22 @@
+{
+  "name": "@scout/ecs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build && tsc --emitDeclarationOnly"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "main": "./src/Engine.ts",
+  "files": [
+    "src"
+  ],
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^6.0.1"
+  },
+  "dependencies": {}
+}
