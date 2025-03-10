@@ -1,15 +1,16 @@
 {
-    "name": "@scout/playground",
-    "type": "module",
-    "scripts": {
-        "dev": "vite",
-        "build": "tsc && vite build",
-        "preview": "vite preview"
-    },
-    "dependencies": {
-        "@scout/engine": "workspace:*",
-        "pixi.js": "^8.6.6",
-        "tick-knock": "^4.3.0",
-        "vite": "^6.0.1"
-    }
+  "name": "@scout/playground",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@scout/engine": "workspace:*",
+    "@scout/ecs": "workspace:*",
+    "pixi.js": "^8.6.6",
+    "tick-knock": "^4.3.0",
+    "vite": "^6.0.1"
+  }
 }

@@ -13,14 +13,14 @@ export default class InputSystem extends System {
     private currentFrame: Set<string> = new Set();
     public wheel = 0;
 
-    constructor() {
+    constructor(target: EventTarget = window) {
         super();
 
         InputSystem._instance = this;
-        window.addEventListener("keydown", e => this.handleKeyDown(e));
-        window.addEventListener("keyup", e => this.handleKeyUp(e));
-        window.addEventListener("blur", () => this.clearAll());
-        window.addEventListener("wheel", e => {
+        target.addEventListener("keydown", e => this.handleKeyDown(e));
+        target.addEventListener("keyup", e => this.handleKeyUp(e));
+        target.addEventListener("blur", () => this.clearAll());
+        target.addEventListener("wheel", e => {
             this.wheel += e.deltaY * -0.01;
         });
     }

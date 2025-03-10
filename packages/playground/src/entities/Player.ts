@@ -1,8 +1,8 @@
 import { Animator, CircleCollider, Collider, Controller, Renderable, Rigidbody, Transform } from "@scout/engine/components/index.ts";
-import { CAMERA_FOCUS } from "@scout/engine/components/Tags.ts";
 import { Entity } from "tick-knock";
 import PLAYER_CONTROLLER from "../components/PlayerController";
 import Resources from "../resources/Resources.ts";
+import { CAMERA_FOCUS } from "@scout/engine/components/Tags.js";
 
 export default function createPlayer() {
     const player = new Entity()
