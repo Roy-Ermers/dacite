@@ -5,9 +5,11 @@ import SpatialLookupSystem from "@scout/engine/systems/SpatialLookupSystem.ts";
 import { Application, TextureSource } from "pixi.js";
 import { Engine as EcsEngine } from "tick-knock";
 import RenderSystem from "./systems/RenderSystem";
+import Scope from "@scout/ecs";
 
 interface EngineOptions {
   canvas?: HTMLCanvasElement;
+  debug?: boolean;
 }
 
 export default class Engine {
@@ -22,6 +24,7 @@ export default class Engine {
 
   public readonly app: Application;
   public readonly ecs = new EcsEngine();
+	public readonly newEcs = new Scope();
 
   private timeStart: number = 0;
 
@@ -42,7 +45,7 @@ export default class Engine {
     /* @ts-ignore-next-line To support devtools */
     globalThis.__PIXI_APP__ = this.app;
     /* @ts-ignore-next-line To support devtools */
-    globalThis.__ECS__ = this.ecs;
+    globalThis.__ECS__ = this.newEcs;
   }
 
   addSystem(...systems: BaseSystem[]) {
@@ -83,9 +86,15 @@ export default class Engine {
       }
     });
 
+    if(options?.debug) {
+    	console.log("Debug mode enabled");
+			this.newEcs.eventbus.onAny((...args: any[]) => console.log("⚡", ...args));
+    }
+
     this.timeStart = Date.now();
 
     this.app.ticker.add((ticker) => this.ecs.update(1 / ticker.deltaMS));
+    this.app.ticker.add(() => this.newEcs.update());
 
     this.ecs
       .addSystem(new RenderSystem)

@@ -1,43 +1,26 @@
 {
-  "compilerOptions": {
-    "useDefineForClassFields": false,
-    "target": "esnext",
-    "module": "esnext",
-    "baseUrl": ".",
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "customConditions": [
-      "source"
-    ],
-    "paths": {
-      "@scout/engine": [
-        "packages/engine/src"
-      ],
-      "@scout/playground": [
-        "packages/playground/src"
-      ],
-    },
+	"compilerOptions": {
+		"useDefineForClassFields": false,
+		"target": "ES2015",
+		"module": "ESNext",
+		"baseUrl": ".",
+		"lib": ["ESNext", "DOM", "DOM.Iterable", "ESNext.Disposable"],
+		"customConditions": ["source"],
+		/* Bundler mode */
+		"declaration": true,
+		"moduleResolution": "bundler",
+		"noEmit": true,
+		"isolatedModules": true,
+		"allowImportingTsExtensions": true,
 
-    /* Bundler mode */
-    "declaration": true,
-    "moduleResolution": "bundler",
-    "noEmit": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-
-    /* Linting */
-    "strict": true,
-    "stripInternal": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "noImplicitOverride": true,
-  },
-  "include": [
-    "packages/**/*.ts"
-  ]
+		/* Linting */
+		"strict": true,
+		"stripInternal": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+		"noImplicitOverride": true
+	}
+	// "include": ["packages/playground/*.ts"]
 }

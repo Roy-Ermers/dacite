@@ -1,5 +1,5 @@
-import ComponentSymbols from "../Components/ComponentSymbols";
-import { ComponentTypeSymbolConstructor, AllowedComponentTypes } from "../Components/ComponentTypes";
+import ComponentSymbols from "../components/ComponentSymbols";
+import { ComponentTypeSymbolConstructor, AllowedComponentTypes } from "../components/ComponentTypes";
 import { Type } from "./Types";
 
 export default class ComponentParser {
@@ -8,7 +8,11 @@ export default class ComponentParser {
 		return typeof (component as any)[ComponentSymbols.componentType] === 'function';
 	}
 
-	public static getBaseComponentType<T extends Type<AllowedComponentTypes> | Function>(component: T): Type {
+	public static getBaseComponentType<T extends Type<AllowedComponentTypes> | Function | symbol>(component: T): Type | symbol {
+		if(typeof component === 'symbol') {
+			return component;
+		}
+
 		const cacheHit = this.typeCache.get(component);
 
 		if (cacheHit)

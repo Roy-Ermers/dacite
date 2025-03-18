@@ -1,16 +1,37 @@
-import { Type } from "../Utils/Types";
+import { Type } from "../utils/Types";
 import ComponentSymbols from "./ComponentSymbols";
 import { AllowedComponentTypes } from "./ComponentTypes";
 
+/**
+* A set of components, allows you to assign more than one of the same components to a entity.
+* Main way to create one is the `create` shorthand
+* @example
+* class Force {
+*   constructor(public direction: Vector2) {}
+* }
+*
+* const forceComponentSet = ComponentSet.create(Force);
+*
+* const entity = scope.entity()
+*		.set(new ForceComponentSet(new Force(Vector2.One)));
+*
+* const set = entity.get(ForceComponentSet);
+* set.add(new Force(Vector2.Zero));
+*
+* for(const force of set) {
+*   console.log(force.direction);
+*	}
+*/
 export default class ComponentSet<T extends AllowedComponentTypes> {
 	private components: T[] = [];
 	private ids = new Map<T, number>();
 
 	static create<T extends AllowedComponentTypes>(type: Type<T>): typeof ComponentSet<T> {
-		const newSet = class extends ComponentSet<T> { }
-		Object.assign(newSet.constructor, { name: type.constructor.name + "ComponentSet" });
-
-		return newSet;
+		const name = type.name + "ComponentSet";
+		const incubator = {
+			[name]: class extends ComponentSet<T> { }
+		}
+		return incubator[name];
 	}
 
 	get size() {
@@ -57,6 +78,7 @@ export default class ComponentSet<T extends AllowedComponentTypes> {
 	delete(component: T) {
 		const index = this.components.findIndex(x => x === component);
 		this.components.splice(index, 1);
+		this.ids.delete(component);
 	}
 
 	[Symbol.iterator]() {

@@ -1,14 +1,13 @@
 {
-    "name": "@scout/monorepo",
-    "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
-    "scripts": {
-      "dev": "npm run -w=@scout/playground dev"
-    },
-    "packageManager": "npm@10.8.1",
-    "devDependencies": {
-        "typescript": "^5.7.3"
-    }
+	"name": "@scout/monorepo",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"dev": "npm run -w=@scout/playground dev"
+	},
+	"devDependencies": {
+		"typescript": "^5.7.3"
+	}
 }

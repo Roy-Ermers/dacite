@@ -1,4 +1,4 @@
-import { Type } from "../Utils/Types";
+import { Type } from "../utils/Types";
 import ComponentSymbols, { type ComponentTypeSymbol } from "./ComponentSymbols";
 
 export type AllowedComponentTypes = Object;
