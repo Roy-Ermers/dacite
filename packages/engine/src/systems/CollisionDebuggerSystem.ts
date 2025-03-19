@@ -1,8 +1,8 @@
-import Engine from "@scout/engine";
-import Transform from "@scout/engine/components/Transform.ts";
-import BoxCollider from "@scout/engine/components/colliders/BoxCollider.ts";
-import CircleCollider from "@scout/engine/components/colliders/CircleCollider.ts";
-import Collider from "@scout/engine/components/colliders/Collider.ts";
+import Engine from "@dacite/engine";
+import Transform from "@dacite/engine/components/Transform.ts";
+import BoxCollider from "@dacite/engine/components/colliders/BoxCollider.ts";
+import CircleCollider from "@dacite/engine/components/colliders/CircleCollider.ts";
+import Collider from "@dacite/engine/components/colliders/Collider.ts";
 import { Container, Graphics } from "pixi.js";
 import { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";

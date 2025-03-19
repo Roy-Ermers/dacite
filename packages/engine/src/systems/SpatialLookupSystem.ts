@@ -1,5 +1,5 @@
-import Transform from "@scout/engine/components/Transform.ts";
-import SpatialMap from "@scout/engine/utils/SpatialMap.ts";
+import Transform from "@dacite/engine/components/Transform.ts";
+import SpatialMap from "@dacite/engine/utils/SpatialMap.ts";
 import type { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
 

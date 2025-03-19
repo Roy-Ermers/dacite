@@ -1,4 +1,4 @@
-import Vector2 from "@scout/engine/utils/Vector2.ts";
+import Vector2 from "@dacite/engine/utils/Vector2.ts";
 import type { Body } from "p2-es";
 
 export type RigidbodyType = |

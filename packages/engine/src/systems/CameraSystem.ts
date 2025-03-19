@@ -1,8 +1,8 @@
-import Engine from "@scout/engine";
-import { CAMERA_FOCUS } from "@scout/engine/components/Tags.ts";
-import Transform from "@scout/engine/components/Transform.ts";
-import lerp from "@scout/engine/utils/Lerp.ts";
-import Vector2 from "@scout/engine/utils/Vector2.ts";
+import Engine from "@dacite/engine";
+import { CAMERA_FOCUS } from "@dacite/engine/components/Tags.ts";
+import Transform from "@dacite/engine/components/Transform.ts";
+import lerp from "@dacite/engine/utils/Lerp.ts";
+import Vector2 from "@dacite/engine/utils/Vector2.ts";
 import type { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";
 import InputSystem from "./InputSystem";

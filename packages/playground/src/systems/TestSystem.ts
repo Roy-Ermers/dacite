@@ -1,6 +1,6 @@
-import { Entity, EntitySystem, Query, InferQuerySet } from "@scout/ecs";
-import { Renderable, Transform } from "@scout/engine";
-import Engine from "@scout/engine/Engine.js";
+import { Entity, EntitySystem, Query, InferQuerySet } from "@dacite/ecs";
+import { Renderable, Transform } from "@dacite/engine";
+import Engine from "@dacite/engine/Engine.js";
 import { Container } from "pixi.js";
 
 

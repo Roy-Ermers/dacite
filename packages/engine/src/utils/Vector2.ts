@@ -1,4 +1,4 @@
-import lerp from "@scout/engine/utils/Lerp.ts";
+import lerp from "@dacite/engine/utils/Lerp.ts";
 
 const DEGREE_TO_RADIAL = Math.PI / 180;
 

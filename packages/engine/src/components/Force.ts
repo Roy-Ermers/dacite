@@ -1,4 +1,4 @@
-import type Vector2 from "@scout/engine/utils/Vector2.ts";
+import type Vector2 from "@dacite/engine/utils/Vector2.ts";
 import { LinkedComponent } from "tick-knock";
 
 type ForceType = "force" | "impulse";

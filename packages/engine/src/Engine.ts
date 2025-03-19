@@ -1,11 +1,11 @@
-import Entity from "@scout/engine/entities/Entity.ts";
-import BaseSystem from "@scout/engine/systems/BaseSystem.ts";
-import InputSystem from "@scout/engine/systems/InputSystem.ts";
-import SpatialLookupSystem from "@scout/engine/systems/SpatialLookupSystem.ts";
+import Entity from "@dacite/engine/entities/Entity.ts";
+import BaseSystem from "@dacite/engine/systems/BaseSystem.ts";
+import InputSystem from "@dacite/engine/systems/InputSystem.ts";
+import SpatialLookupSystem from "@dacite/engine/systems/SpatialLookupSystem.ts";
 import { Application, TextureSource } from "pixi.js";
 import { Engine as EcsEngine } from "tick-knock";
 import RenderSystem from "./systems/RenderSystem";
-import Scope from "@scout/ecs";
+import Scope from "@dacite/ecs";
 
 interface EngineOptions {
   canvas?: HTMLCanvasElement;

@@ -1,12 +1,12 @@
-import Animator from "@scout/engine/components/Animator.ts";
-import Controller from "@scout/engine/components/Controller.ts";
-import Force from "@scout/engine/components/Force.js";
-import Renderable from "@scout/engine/components/Renderable.ts";
-import Rigidbody from "@scout/engine/components/Rigidbody.ts";
-import BaseSystem from "@scout/engine/systems/BaseSystem.ts";
-import InputSystem from "@scout/engine/systems/InputSystem.ts";
-import Random from "@scout/engine/utils/Random.ts";
-import Vector2 from "@scout/engine/utils/Vector2.ts";
+import Animator from "@dacite/engine/components/Animator.ts";
+import Controller from "@dacite/engine/components/Controller.ts";
+import Force from "@dacite/engine/components/Force.js";
+import Renderable from "@dacite/engine/components/Renderable.ts";
+import Rigidbody from "@dacite/engine/components/Rigidbody.ts";
+import BaseSystem from "@dacite/engine/systems/BaseSystem.ts";
+import InputSystem from "@dacite/engine/systems/InputSystem.ts";
+import Random from "@dacite/engine/utils/Random.ts";
+import Vector2 from "@dacite/engine/utils/Vector2.ts";
 import { Entity } from "tick-knock";
 import PLAYER_CONTROLLER from "../components/PlayerController.ts";
 

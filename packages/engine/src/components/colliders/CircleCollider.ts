@@ -1,4 +1,4 @@
-import Collider from "@scout/engine/components/colliders/Collider.ts";
+import Collider from "@dacite/engine/components/colliders/Collider.ts";
 
 export default class CircleCollider extends Collider {
     get lookupRadius(): number {

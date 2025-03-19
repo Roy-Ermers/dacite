@@ -1,17 +1,16 @@
-import Engine, { BoxCollider, CircleCollider, Collider, Force, Renderable, Rigidbody, TileMapRenderer, Transform } from "@scout/engine";
-import CameraSystem from "@scout/engine/systems/CameraSystem.ts";
-import PhysicsSystem from "@scout/engine/systems/PhysicsSystem.ts";
-import TileManager from "@scout/engine/tiles/TileManager.ts";
-import TexturedTile from "@scout/engine/tiles/types/TexturedTile.ts";
-import Vector2 from "@scout/engine/utils/Vector2.ts";
+import Engine, { BoxCollider, CircleCollider, Collider, Force, Renderable, Rigidbody, TileMapRenderer, Transform } from "@dacite/engine";
+import CameraSystem from "@dacite/engine/systems/CameraSystem.ts";
+import PhysicsSystem from "@dacite/engine/systems/PhysicsSystem.ts";
+import TileManager from "@dacite/engine/tiles/TileManager.ts";
+import TexturedTile from "@dacite/engine/tiles/types/TexturedTile.ts";
+import Vector2 from "@dacite/engine/utils/Vector2.ts";
 import createPlayer from "./entities/Player";
 import Resources from "./resources/Resources.ts";
 import PlayerControllerSystem from "./systems/PlayerControllerSystem";
-import TileMap from "@scout/engine/grid/TileMap.js";
-import CollisionDebuggerSystem from "@scout/engine/systems/CollisionDebuggerSystem.js";
+import TileMap from "@dacite/engine/grid/TileMap.js";
+import CollisionDebuggerSystem from "@dacite/engine/systems/CollisionDebuggerSystem.js";
 import { Sprite } from "pixi.js";
-// import { Entity } from "tick-knock";
-import { Query, Entity } from "@scout/ecs";
+import createInspector from "@dacite/ecs-inspector";
 import RenderSystem from "./systems/TestSystem.ts";
 
 
@@ -22,7 +21,6 @@ async function init() {
   if (!canvas) throw new Error("Canvas not found");
   await game.init({
     canvas,
-    debug: true
   });
 
   await Resources.load();
@@ -57,7 +55,7 @@ async function init() {
   }
 
 	for (let i = 0; i < 1000; i++) {
-		const entity = game.newEcs.entity(`Player ${i}`)
+		const entity = game.newEcs.entity(`Wall`)
 
 		entity.set(new Transform(Vector2.random.multiply(640), Math.random()))
 		entity.set(new Renderable(Sprite.from(Resources.TileSpritesheet.textures['wall'])));
@@ -69,6 +67,7 @@ async function init() {
 
 	const renderSystem = new RenderSystem();
 	game.newEcs.addSystem(renderSystem);
+	createInspector({ scope: game.newEcs, element: canvas.parentElement! });
 
   // const renderer = new TileMapRenderer(tileMap, Resources.TileSpritesheet);
   // const tileMapEntity = new Entity()

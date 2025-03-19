@@ -1,4 +1,4 @@
-import Tile from "@scout/engine/tiles/types/Tile.ts";
+import Tile from "@dacite/engine/tiles/types/Tile.ts";
 
 export default class TileManager {
     private static tiles: Tile[] = [];

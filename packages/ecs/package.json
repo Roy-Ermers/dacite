@@ -1,5 +1,5 @@
 {
-  "name": "@scout/ecs",
+  "name": "@dacite/ecs",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -19,7 +19,7 @@
     "vite": "^6.0.1"
   },
   "peerDependencies": {
-  	"@scout/ecs-inspector": "*"
+  	"@dacite/ecs-inspector": "*"
   },
   "dependencies": {}
 }

@@ -1,6 +1,6 @@
-import Force from "@scout/engine/components/Force.ts";
-import Rigidbody, { type RigidbodyType } from "@scout/engine/components/Rigidbody.ts";
-import Transform from "@scout/engine/components/Transform.ts";
+import Force from "@dacite/engine/components/Force.ts";
+import Rigidbody, { type RigidbodyType } from "@dacite/engine/components/Rigidbody.ts";
+import Transform from "@dacite/engine/components/Transform.ts";
 import { Body, Box, Circle, World } from "p2-es";
 import { Entity } from "tick-knock";
 import BaseSystem from "./BaseSystem";

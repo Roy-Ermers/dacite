@@ -1,4 +1,4 @@
-import Scope from "@scout/ecs/Scope.js";
+import Scope from "@dacite/ecs";
 
 declare global {
 	var scope: Scope;

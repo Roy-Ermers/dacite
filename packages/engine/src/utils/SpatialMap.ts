@@ -1,5 +1,5 @@
-import Renderable from "@scout/engine/components/Renderable.ts";
-import Transform from "@scout/engine/components/Transform.ts";
+import Renderable from "@dacite/engine/components/Renderable.ts";
+import Transform from "@dacite/engine/components/Transform.ts";
 import type { Container } from "pixi.js";
 import type { Entity } from "tick-knock";
 import MathExtensions from "./MathExtensions";

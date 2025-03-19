@@ -37,7 +37,6 @@ export default class Entity<S = unknown> {
 	}
 
 	destroy(): void {
-		console.log("Destroying entity");
 		this.scope.destroyEntity(this._id);
 	}
 

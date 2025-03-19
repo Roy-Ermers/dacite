@@ -1,11 +1,11 @@
 {
-	"name": "@scout/monorepo",
+	"name": "@dacite/monorepo",
 	"private": true,
 	"workspaces": [
 		"packages/*"
 	],
 	"scripts": {
-		"dev": "npm run -w=@scout/playground dev"
+		"dev": "npm run -w=@dacite/playground dev"
 	},
 	"devDependencies": {
 		"typescript": "^5.7.3"

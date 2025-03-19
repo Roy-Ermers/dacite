@@ -1,4 +1,4 @@
-import Engine from "@scout/engine";
+import Engine from "@dacite/engine";
 import { Entity, EntitySnapshot, Query, QueryBuilder, QueryPredicate, ReactionSystem } from "tick-knock";
 
 export default abstract class BaseSystem extends ReactionSystem {
