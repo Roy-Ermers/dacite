@@ -1,46 +1,70 @@
 import ComponentSymbols from "../components/ComponentSymbols";
-import { ComponentTypeSymbolConstructor, AllowedComponentTypes } from "../components/ComponentTypes";
-import { Type } from "./Types";
+import type { Type } from "./Types";
 
-export default class ComponentParser {
-	static typeCache: Map<Type | Function, Type> = new Map();
-	private static hasComponentType(component: unknown): component is ComponentTypeSymbolConstructor {
-		return typeof (component as any)[ComponentSymbols.componentType] === 'function';
-	}
+const typeCache: Map<Type | ((...args: unknown[]) => unknown), Type> =
+	new Map();
 
-	public static getBaseComponentType<T extends Type<AllowedComponentTypes> | Function | symbol>(component: T): Type | symbol {
-		if(typeof component === 'symbol') {
-			return component;
-		}
-
-		const cacheHit = this.typeCache.get(component);
-
-		if (cacheHit)
-			return cacheHit;
-
-		const type = this.parseBaseComponentType(component);
-		this.typeCache.set(component, type);
-
-		return type;
-	}
-
-	private static parseBaseComponentType<T extends Type<AllowedComponentTypes> | Function>(component: T): Type {
-		let type = component;
-		// walk up the prototype chain to find the first class with a component type or the base class
-		while (type.name !== '') {
-			if (this.hasComponentType(type)) {
-				return type[ComponentSymbols.componentType]();
-			}
-			const newType = Object.getPrototypeOf(type.constructor);
-
-			if (newType.name === '') {
-				return type as Type;
-			}
-
-			type = newType;
-		}
-
-		console.error(component, type);
-		throw new Error("Component type not found");
-	}
+export interface ComponentTypeSymbolConstructor {
+	[ComponentSymbols.componentType](): Type;
 }
+
+function hasComponentType(
+	component: unknown
+): component is ComponentTypeSymbolConstructor {
+	if (typeof component !== "object" || !component) {
+		return false;
+	}
+
+	if (ComponentSymbols.componentType in component)
+		return typeof component[ComponentSymbols.componentType] === "function";
+
+	return false;
+}
+
+function parseBaseComponentType<
+	T extends Type | ((...args: unknown[]) => unknown)
+>(component: T): Type {
+	let type = component;
+	// walk up the prototype chain to find the first class with a component type or the base class
+	while (type.name !== "") {
+		if (hasComponentType(type)) {
+			return type[ComponentSymbols.componentType]();
+		}
+		const newType = Object.getPrototypeOf(type.constructor);
+
+		if (newType.name === "") {
+			return type as Type;
+		}
+
+		type = newType;
+	}
+
+	console.error(component, type);
+	throw new Error("Component type not found");
+}
+
+/**
+ * Get the base component type from a component.
+ * @param component Component to get the type from
+ * @returns The base component type to match against.
+ */
+export function getBaseComponentType<
+	T extends Type | ((...args: unknown[]) => unknown) | symbol
+>(component: T): Type | symbol {
+	if (typeof component === "symbol") {
+		return component;
+	}
+
+	const cacheHit = typeCache.get(component);
+
+	if (cacheHit) return cacheHit;
+
+	const type = parseBaseComponentType(component);
+	typeCache.set(component, type);
+
+	return type;
+}
+
+export default {
+	getBaseComponentType
+};

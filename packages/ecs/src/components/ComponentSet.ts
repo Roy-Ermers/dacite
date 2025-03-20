@@ -1,36 +1,37 @@
-import { Type } from "../utils/Types";
+import type { ClassInstance, Type } from "../utils/Types";
 import ComponentSymbols from "./ComponentSymbols";
-import { AllowedComponentTypes } from "./ComponentTypes";
 
 /**
-* A set of components, allows you to assign more than one of the same components to a entity.
-* Main way to create one is the `create` shorthand
-* @example
-* class Force {
-*   constructor(public direction: Vector2) {}
-* }
-*
-* const forceComponentSet = ComponentSet.create(Force);
-*
-* const entity = scope.entity()
-*		.set(new ForceComponentSet(new Force(Vector2.One)));
-*
-* const set = entity.get(ForceComponentSet);
-* set.add(new Force(Vector2.Zero));
-*
-* for(const force of set) {
-*   console.log(force.direction);
-*	}
-*/
-export default class ComponentSet<T extends AllowedComponentTypes> {
+ * A set of components, allows you to assign more than one of the same components to a entity.
+ * Main way to create one is the `create` shorthand
+ * @example
+ * class Force {
+ *   constructor(public direction: Vector2) {}
+ * }
+ *
+ * const forceComponentSet = ComponentSet.create(Force);
+ *
+ * const entity = scope.entity()
+ *		.set(new ForceComponentSet(new Force(Vector2.One)));
+ *
+ * const set = entity.get(ForceComponentSet);
+ * set.add(new Force(Vector2.Zero));
+ *
+ * for(const force of set) {
+ *   console.log(force.direction);
+ *	}
+ */
+export default class ComponentSet<T extends ClassInstance> {
 	private components: T[] = [];
 	private ids = new Map<T, number>();
 
-	static create<T extends AllowedComponentTypes>(type: Type<T>): typeof ComponentSet<T> {
-		const name = type.name + "ComponentSet";
+	static create<T extends ClassInstance>(
+		type: Type<T>
+	): typeof ComponentSet<T> {
+		const name = `${type.name}ComponentSet`;
 		const incubator = {
-			[name]: class extends ComponentSet<T> { }
-		}
+			[name]: class extends ComponentSet<T> {}
+		};
 		return incubator[name];
 	}
 
@@ -39,6 +40,7 @@ export default class ComponentSet<T extends AllowedComponentTypes> {
 	}
 
 	static [ComponentSymbols.componentType]() {
+		// biome-ignore lint: We actually want to return the class type itself here.
 		return this;
 	}
 
@@ -54,8 +56,8 @@ export default class ComponentSet<T extends AllowedComponentTypes> {
 
 	add(component: T): void;
 	add(component: T, index: number): void;
-	add(component: T, index?: number) {
-		index ??= this.indexOf(component);
+	add(component: T, _index?: number) {
+		const index = _index ?? this.indexOf(component);
 
 		if (index !== undefined) {
 			this.components[index] = component;
@@ -73,7 +75,6 @@ export default class ComponentSet<T extends AllowedComponentTypes> {
 	has(component: T): boolean {
 		return this.components.some(x => component === x);
 	}
-
 
 	delete(component: T) {
 		const index = this.components.findIndex(x => x === component);

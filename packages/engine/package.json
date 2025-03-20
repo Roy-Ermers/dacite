@@ -17,7 +17,7 @@
   "devDependencies": {
     "gl": "^8.1.6",
     "typescript": "^5.7.3",
-    "vite": "^6.0.1"
+    "unbuild": "^3.5.0"
   },
   "overrides": {
     "pixijs": {
@@ -25,8 +25,8 @@
     }
   },
   "dependencies": {
-    "p2-es": "^1.2.3",
     "@dacite/ecs": "*",
+    "p2-es": "^1.2.3",
     "pixi.js": "^8.6.6",
     "tick-knock": "^4.3.0"
   }

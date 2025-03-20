@@ -3,72 +3,92 @@
 }
 
 #inspector[data-theme="dark"] {
-	--brand: hsl(var(--brand-hue) calc(var(--brand-saturation) / 2) calc(var(--brand-lightness) / 1.5));
-  --text-1: hsl(var(--brand-hue) 15% 85%);
-  --text-2: hsl(var(--brand-hue) 5% 65%);
-  --surface-1: hsl(var(--brand-hue) 10% 10%);
-  --surface-2: hsl(var(--brand-hue) 10% 15%);
-  --surface-3: hsl(var(--brand-hue) 5%  20%);
-  --surface-4: hsl(var(--brand-hue) 5% 25%);
-  --surface-shadow: var(--brand-hue) 50% 3%;
-  --shadow-strength: .8;
+	--brand: hsl(
+		var(--brand-hue) calc(var(--brand-saturation) / 2)
+			calc(var(--brand-lightness) / 1.5)
+	);
+	--text-1: hsl(var(--brand-hue) 15% 85%);
+	--text-2: hsl(var(--brand-hue) 5% 65%);
+	--surface-1: hsl(var(--brand-hue) 10% 10%);
+	--surface-2: hsl(var(--brand-hue) 10% 15%);
+	--surface-3: hsl(var(--brand-hue) 5% 20%);
+	--surface-4: hsl(var(--brand-hue) 5% 25%);
+	--surface-shadow: var(--brand-hue) 50% 3%;
+	--shadow-strength: 0.8;
 }
 
-#inspector[data-theme="light"], #inspector {
+#inspector[data-theme="light"],
+#inspector {
 	--brand: hsl(var(--brand-hue) var(--brand-saturation) var(--brand-lightness));
-  --text-1: hsl(var(--brand-hue) var(--brand-saturation) 10%);
-  --text-2: hsl(var(--brand-hue) 30% 30%);
-  --surface-1: hsl(var(--brand-hue) 25% 90%);
-  --surface-2: hsl(var(--brand-hue) 20% 99%);
-  --surface-3: hsl(var(--brand-hue) 20% 92%);
-  --surface-4: hsl(var(--brand-hue) 20% 85%);
-  --surface-shadow: var(--brand-hue) 10% calc(var(--brand-lightness) / 5);
-  --shadow-strength: .02;
+	--text-1: hsl(var(--brand-hue) var(--brand-saturation) 10%);
+	--text-2: hsl(var(--brand-hue) 30% 30%);
+	--surface-1: hsl(var(--brand-hue) 25% 90%);
+	--surface-2: hsl(var(--brand-hue) 20% 99%);
+	--surface-3: hsl(var(--brand-hue) 20% 92%);
+	--surface-4: hsl(var(--brand-hue) 20% 85%);
+	--surface-shadow: var(--brand-hue) 10% calc(var(--brand-lightness) / 5);
+	--shadow-strength: 0.02;
 }
 
 #inspector {
 	--brand-hue: 200;
-  --brand-saturation: 100%;
-  --brand-lightness: 50%;
-  --border-radius: 0.25rem;
+	--brand-saturation: 100%;
+	--brand-lightness: 50%;
+	--border-radius: 0.25rem;
 
- 	position: fixed;
-  accent-color: var(--brand);
+	position: fixed;
+	accent-color: var(--brand);
 	inset: 0.25rem;
 	inset-inline-start: unset;
 	inset-inline-end: calc(min(-25vw, -30rem) + 0.5rem);
 	width: max(25vw, 30rem);
-  display: grid;
-  grid-template-columns: [full-start] 0.5rem [main-start] 1fr [main-end] 0.5rem [full-end];
-  place-content: start;
+	display: grid;
+	grid-template-columns: [full-start] 0.5rem [main-start] 1fr [main-end] 0.5rem [full-end];
+	place-content: start;
 	font-family: monospace;
 	font-size: 0.875rem;
-  background-color: var(--surface-1);
-  border: 1px solid var(--surface-2);
-  color: var(--text-1);
-  box-shadow: var(--surface-shadow);
-  border-start-start-radius: var(--border-radius);
-  border-end-start-radius: var(--border-radius);
-  overflow: auto;
-  overflow-x: clip;
-  transition: inset-inline-end 500ms cubic-bezier(0.19, 1, 0.22, 1);
+	background-color: var(--surface-1);
+	border: 1px solid var(--surface-2);
+	color: var(--text-1);
+	box-shadow: var(--surface-shadow);
+	border-start-start-radius: var(--border-radius);
+	border-end-start-radius: var(--border-radius);
+	overflow: auto;
+	overflow-x: clip;
+	transition: inset-inline-end 500ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 :where(#inspector > *) {
 	grid-column: main;
 }
 
-#inspector:hover, #inspector:focus-within, #inspector:has(.stay-open:checked) {
+#inspector:hover,
+#inspector:focus-within,
+#inspector:has(.stay-open:checked) {
 	inset-inline-end: 0;
 }
 
 #inspector .rad-shadow {
-  box-shadow:
-    0 2.8px 2.2px hsl(var(--surface-shadow) / calc(var(--shadow-strength) + .03)),
-    0 6.7px 5.3px hsl(var(--surface-shadow) / calc(var(--shadow-strength) + .01)),
-    0 12.5px 10px hsl(var(--surface-shadow) / calc(var(--shadow-strength) + .02)),
-    0 22.3px 17.9px hsl(var(--surface-shadow) / calc(var(--shadow-strength) + .02)),
-    0 41.8px 33.4px hsl(var(--surface-shadow) / calc(var(--shadow-strength) + .03)),
-    0 100px 80px hsl(var(--surface-shadow) / var(--shadow-strength))
-  ;
+	box-shadow:
+		0 2.8px 2.2px hsl(
+			var(--surface-shadow) /
+			calc(var(--shadow-strength) + 0.03)
+		),
+		0 6.7px 5.3px hsl(
+			var(--surface-shadow) /
+			calc(var(--shadow-strength) + 0.01)
+		),
+		0 12.5px 10px hsl(
+			var(--surface-shadow) /
+			calc(var(--shadow-strength) + 0.02)
+		),
+		0 22.3px 17.9px hsl(
+			var(--surface-shadow) /
+			calc(var(--shadow-strength) + 0.02)
+		),
+		0 41.8px 33.4px hsl(
+			var(--surface-shadow) /
+			calc(var(--shadow-strength) + 0.03)
+		),
+		0 100px 80px hsl(var(--surface-shadow) / var(--shadow-strength));
 }

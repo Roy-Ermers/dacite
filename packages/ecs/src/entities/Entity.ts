@@ -1,8 +1,7 @@
-import { type default as Scope,  NAME_SYMBOL } from "../Scope";
-import ComponentParser from "../utils/ComponentParser";
-import type { Append, Type } from "../utils/Types";
+import { NAME_SYMBOL, type default as Scope } from "../Scope";
+import type { Append, ClassInstance, Type } from "../utils/Types";
 
-export type EntityComponentType<S, T> = S extends T ? T : (T | null);
+export type EntityComponentType<S, T> = S extends T ? T : T | null;
 
 // generic describes all possible components
 export default class Entity<S = unknown> {
@@ -18,14 +17,27 @@ export default class Entity<S = unknown> {
 		this._id = value;
 	}
 
+	/**
+	 * The name of the entity, can be used to identify it.
+	 */
 	public get name() {
-		return this.scope.getComponentSet<string>(NAME_SYMBOL, { create: false }).get(this.id) ?? 'Unknown entity';
+		return (
+			this.scope
+				.getComponentSet<string>(NAME_SYMBOL, { create: false })
+				.get(this.id) ?? "Unknown entity"
+		);
 	}
 
+	/**
+	 * The name of the entity, can be used to identify it.
+	 */
 	public set name(value: string) {
 		this.scope.getComponentSet(NAME_SYMBOL).set(this.id, value);
 	}
 
+	/**
+	 * Check if the entity is alive.
+	 */
 	public get isAlive() {
 		return this.scope.isAlive(this.id);
 	}
@@ -36,65 +48,108 @@ export default class Entity<S = unknown> {
 		this.scope = scope;
 	}
 
+	/**
+	 * Destroy this entity, after this it won't be available anymore.
+	 */
 	destroy(): void {
 		this.scope.destroyEntity(this._id);
 	}
 
-	set<T extends Object>(component: T) {
-		if(typeof component === 'symbol') {
+	/**
+	 * Set a component on this entity.
+	 * @param component the component to add
+	 * @returns current entity
+	 */
+	set<T extends ClassInstance>(component: T) {
+		if (typeof component === "symbol") {
 			this.setTag(component);
 			return this as unknown as Entity<Append<S, T>>;
 		}
 
-		const set = this.scope.getComponentSet(component.constructor, { create: true });
-		if(!set.has(this.id))
-			this.scope.eventbus.emit("componentadded", this, component);
+		const set = this.scope.getComponentSet(
+			component.constructor as Type<ClassInstance>,
+			{
+				create: true
+			}
+		);
+
+		const added = !set.has(this.id);
 
 		set.set(this.id, component);
 
+		if (added) this.scope.eventbus.emit("componentadded", this, component);
 		return this as unknown as Entity<Append<S, T>>;
 	}
 
-	get<T extends Object>(componentType: Type<T>): EntityComponentType<S, T> {
+	/**
+	 * Get a component from this entity
+	 * @param componentType The component type to get
+	 * @returns the component that matches T or null
+	 */
+	get<T extends ClassInstance>(
+		componentType: Type<T>
+	): EntityComponentType<S, T> {
 		const set = this.scope.getComponentSet(componentType);
-		if (!set)
-			return null as EntityComponentType<S, T>;
+		if (!set) return null as EntityComponentType<S, T>;
 
 		return set.get(this.id) as EntityComponentType<S, T>;
 	}
 
+	/**
+	 * # ! Use with caution, this is not a cheap operation. !
+	 *
+	 * Get all components assigned to this entity.
+	 * @returns All components assigned to this entity
+	 */
 	getAll() {
 		const components: unknown[] = [...this[Symbol.iterator]()];
 		return components;
 	}
 
-	has<T extends Object>(component: symbol): boolean;
-	has<T extends Object>(component: Type<T>): boolean;
-	has<T extends Object>(component: Type<T> | symbol): boolean;
-	has<T extends Object>(component: Type<T> | symbol) {
-		if(typeof component == 'symbol') {
+	/**
+	 * Checks if this entity has the component
+	 * @param component Component to check for
+	 */
+	has<T extends ClassInstance>(component: symbol): boolean;
+	/**
+	 * Checks if this entity has the component
+	 * @param component Component to check for
+	 */
+	has<T extends ClassInstance>(component: Type<T>): boolean;
+	/**
+	 * Checks if this entity has the component
+	 * @param component Component to check for
+	 */
+	has<T extends ClassInstance>(component: Type<T> | symbol): boolean;
+	has<T extends ClassInstance>(component: Type<T> | symbol) {
+		if (typeof component === "symbol") {
 			return this.hasTag(component);
 		}
 
 		const set = this.scope.getComponentSet(component);
 
-		if(!set) {
+		if (!set) {
 			return false;
 		}
 
 		return set.has(this.id);
 	}
 
+	/**
+	 * Checks if this entity has any components. Can be used if this entity is freshly created or not.
+	 */
 	hasAny(): boolean {
-		for(const set of this.scope.components.values()) {
-			if (set.has(this.id))
-				return true;
+		for (const set of this.scope.components.values()) {
+			if (set.has(this.id)) return true;
 		}
 
 		return false;
 	}
 
-
+	/**
+	 * Set a tag on the entity
+	 * @param tag tag to add
+	 */
 	setTag(tag: symbol) {
 		const tags = this.scope.getTagSet();
 		const existingTags = tags.get(this.id) ?? new Set();
@@ -103,6 +158,11 @@ export default class Entity<S = unknown> {
 		tags.set(this.id, existingTags);
 	}
 
+	/**
+	 * Check if this entity has a tag
+	 * @param tag Tag to check for
+	 * @returns a boolean
+	 */
 	hasTag(tag: symbol) {
 		const tags = this.scope.getTagSet();
 		const existingTags = tags.get(this.id);
@@ -110,35 +170,53 @@ export default class Entity<S = unknown> {
 		return existingTags?.has(tag) ?? false;
 	}
 
+	/**
+	 * Remove a tag from this entity.
+	 * @param tag tag to remove
+	 */
 	removeTag(tag: symbol) {
 		const tags = this.scope.getTagSet();
 		const existingTags = tags.get(this.id);
 
-		if(existingTags) {
+		if (existingTags) {
 			existingTags.delete(tag);
 		}
 	}
 
-	remove<T extends Object>(component: Type<T> | T) {
-		if (typeof component !== 'function')
-			component = component.constructor as Type<T>;
+	/**
+	 * remove a component based on type from this entity
+	 */
+	remove<T extends ClassInstance>(component: Type<T>): Entity<Extract<S, T>>;
+	/**
+	 * remove a component based on instance from this entity
+	 */
+	remove<T extends ClassInstance>(component: T): Entity<Extract<S, T>>;
+	/**
+	 * remove a component from this entity
+	 */
+	remove<T extends ClassInstance>(
+		component: T | Type<T>
+	): Entity<Extract<S, T>>;
+	remove<T extends ClassInstance>(component: Type<T> | T) {
+		let type = component;
+		if (typeof type !== "function") type = component.constructor as Type<T>;
 
-		const set = this.scope.getComponentSet(component);
+		const set = this.scope.getComponentSet(type);
 		set.delete(this.id);
-		this.scope.eventbus.emit("componentremoved",this, component);
-		return this as unknown as Entity<Extract<T,S>>;
+		this.scope.eventbus.emit("componentremoved", this, component);
+		return this as unknown as Entity<Extract<T, S>>;
 	}
 
 	*[Symbol.iterator]() {
-		for(const set of this.scope.components.values()) {
-			if(set.has(this.id)) {
+		for (const set of this.scope.components.values()) {
+			if (set.has(this.id)) {
 				yield set.get(this.id);
 			}
 		}
 	}
 
-	[Symbol.toPrimitive](hint: 'string' | 'number' | 'default') {
-		if(hint === 'number') {
+	[Symbol.toPrimitive](hint: "string" | "number" | "default") {
+		if (hint === "number") {
 			return this.id;
 		}
 
@@ -146,6 +224,6 @@ export default class Entity<S = unknown> {
 	}
 
 	[Symbol.toStringTag]() {
-		return 'Entity';
+		return "Entity";
 	}
 }

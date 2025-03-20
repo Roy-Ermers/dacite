@@ -1,13 +1,12 @@
 {
 	"name": "@dacite/monorepo",
-	"private": true,
-	"workspaces": [
-		"packages/*"
-	],
+	"workspaces": ["packages/*"],
 	"scripts": {
 		"dev": "npm run -w=@dacite/playground dev"
 	},
 	"devDependencies": {
-		"typescript": "^5.7.3"
+		"@biomejs/biome": "1.9.4",
+		"typescript": "^5.7.3",
+		"vite-plugin-dts": "^4.5.3"
 	}
 }

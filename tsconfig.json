@@ -1,16 +1,15 @@
 {
 	"compilerOptions": {
 		"useDefineForClassFields": false,
-		"target": "ES2015",
+		"target": "ESNext",
 		"module": "ESNext",
 		"baseUrl": ".",
-		"lib": ["ESNext", "DOM", "DOM.Iterable", "ESNext.Disposable"],
-		"customConditions": ["source"],
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
 		/* Bundler mode */
 		"declaration": true,
 		"moduleResolution": "bundler",
-		"noEmit": true,
 		"isolatedModules": true,
+		"emitDeclarationOnly": true,
 		"allowImportingTsExtensions": true,
 
 		/* Linting */
@@ -20,7 +19,7 @@
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
-		"noImplicitOverride": true
+		"noImplicitOverride": true,
+		"types": ["node"]
 	}
-	// "include": ["packages/playground/*.ts"]
 }

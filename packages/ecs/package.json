@@ -1,25 +1,30 @@
 {
-  "name": "@dacite/ecs",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "vite build && tsc --emitDeclarationOnly"
-  },
-  "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*"
-  },
-  "main": "./src/index.ts",
-  "files": [
-    "src"
-  ],
-  "devDependencies": {
-    "typescript": "^5.7.3",
-    "vite": "^6.0.1"
-  },
-  "peerDependencies": {
-  	"@dacite/ecs-inspector": "*"
-  },
-  "dependencies": {}
+	"name": "@dacite/ecs",
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"build": "unbuild",
+		"prepack": "unbuild"
+	},
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs"
+		},
+		"./utils": {
+			"import": "./dist/utils/index.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"files": ["src", "dist"],
+	"license": "ISC",
+	"keywords": ["ecs", "entity-component-system"],
+	"devDependencies": {
+		"mkdist": "^2.2.0",
+		"typescript": "^5.7.3",
+		"unbuild": "^3.5.0"
+	},
+	"dependencies": {
+		"@types/node": "^22.13.10"
+	}
 }
