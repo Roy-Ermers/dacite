@@ -4,6 +4,10 @@
 	"scripts": {
 		"dev": "npm run -w=@dacite/playground dev"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Roy-Ermers/dacite.git"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"typescript": "^5.7.3",

@@ -4,16 +4,38 @@ import type SparseSet from "../utils/SparseSet";
 import type { Append, ClassInstance, Type } from "../utils/Types";
 
 export type InferQuerySet<T> = T extends Query<infer S> ? S : never;
+
+type Condition = "has" | "hasNot";
+
 export default class Query<S> {
-	private components: Set<Type | symbol> = new Set();
+	private conditions: Map<Type | symbol, Condition> = new Map();
 
 	/**
-	 * Add a component to the query.
+	 * Checks if entity has a component.
 	 * @param component Component to check for
 	 */
 	has<T extends ClassInstance>(component: Type<T> | symbol) {
-		this.components.add(component);
+		this.conditions.set(component, "has");
+
 		return this as Query<Append<S, T>>;
+	}
+
+	/**
+	 * Checks if entity does not have a component.
+	 * @param component Component to check for
+	 */
+	hasNot<T extends ClassInstance>(component: Type<T> | symbol) {
+		this.conditions.set(component, "hasNot");
+
+		return this as Query<Append<S, T>>;
+	}
+	/**
+	 * Remove a component from the query.
+	 * @param component Component to remove
+	 */
+	clear() {
+		this.conditions.clear();
+		return this as Query<unknown>;
 	}
 
 	/**
@@ -22,8 +44,9 @@ export default class Query<S> {
 	 * @returns true or false
 	 */
 	matches(entity: Entity): boolean {
-		for (const component of this.components) {
-			if (!entity.has(component)) return false;
+		for (const [component, condition] of this.conditions) {
+			if (!entity.has(component) && condition === "has") return false;
+			if (entity.has(component) && condition === "hasNot") return false;
 		}
 		return true;
 	}
@@ -34,33 +57,38 @@ export default class Query<S> {
 	 * @returns a iterator that returns all matching ids
 	 */
 	*ids(scope: Scope) {
-		if (this.components.size === 0) {
+		if (this.conditions.size === 0) {
 			console.warn("Query matches all entities.");
 			yield* scope.ids();
 			return;
 		}
 
-		if (this.components.size === 1) {
-			yield* this.executeFastTrack(scope, [...this.components][0]);
+		if (this.conditions.size === 1) {
+			const [[component, condition]] = [...this.conditions.entries()];
+
+			if (condition === "has")
+				yield* this.executeHasFastTrack(scope, component);
 			return;
 		}
 
-		const sets = new Set<SparseSet<unknown>>();
+		const sets = new Map<SparseSet<unknown>, Condition>();
 
-		for (const component of this.components) {
+		for (const [component, condition] of this.conditions) {
 			const set = scope.getComponentSet(component);
 
 			// component is not in use yet.
-			if (!set) continue;
+			if (!set && condition === "has") return;
 
-			sets.add(set);
+			sets.set(set, condition);
 		}
 
 		if (sets.size === 0) return;
 
 		entityLoop: for (const entityId of scope.ids()) {
-			for (const set of sets) {
-				if (!set.has(entityId)) continue entityLoop;
+			for (const [set, condition] of sets) {
+				if (!set.has(entityId) && condition === "has") continue entityLoop;
+
+				if (set.has(entityId) && condition === "hasNot") continue entityLoop;
 			}
 
 			yield entityId;
@@ -80,7 +108,7 @@ export default class Query<S> {
 		}
 	}
 
-	private *executeFastTrack(scope: Scope, component: Type | symbol) {
+	private *executeHasFastTrack(scope: Scope, component: Type | symbol) {
 		const set = scope.getComponentSet(component);
 		if (!set) return;
 		for (const id of set.keys()) {

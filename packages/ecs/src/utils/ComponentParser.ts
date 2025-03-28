@@ -1,8 +1,10 @@
 import ComponentSymbols from "../components/ComponentSymbols";
 import type { Type } from "./Types";
 
-const typeCache: Map<Type | ((...args: unknown[]) => unknown), Type> =
-	new Map();
+const typeCache: Map<
+	Type<unknown> | ((...args: unknown[]) => unknown) | symbol,
+	Type
+> = new Map();
 
 export interface ComponentTypeSymbolConstructor {
 	[ComponentSymbols.componentType](): Type;
@@ -22,7 +24,7 @@ function hasComponentType(
 }
 
 function parseBaseComponentType<
-	T extends Type | ((...args: unknown[]) => unknown)
+	T extends Type<unknown> | ((...args: unknown[]) => unknown)
 >(component: T): Type {
 	let type = component;
 	// walk up the prototype chain to find the first class with a component type or the base class
@@ -30,7 +32,7 @@ function parseBaseComponentType<
 		if (hasComponentType(type)) {
 			return type[ComponentSymbols.componentType]();
 		}
-		const newType = Object.getPrototypeOf(type.constructor);
+		const newType = Object.getPrototypeOf(type);
 
 		if (newType.name === "") {
 			return type as Type;
@@ -49,7 +51,7 @@ function parseBaseComponentType<
  * @returns The base component type to match against.
  */
 export function getBaseComponentType<
-	T extends Type | ((...args: unknown[]) => unknown) | symbol
+	T extends Type<unknown> | ((...args: unknown[]) => unknown) | symbol
 >(component: T): Type | symbol {
 	if (typeof component === "symbol") {
 		return component;

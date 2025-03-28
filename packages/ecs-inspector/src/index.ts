@@ -1,27 +1,35 @@
-import Scope from "@dacite/ecs";
-import appTemplate from "./App.vue";
+import type { Scope } from "@dacite/ecs";
 import { createApp, defineAsyncComponent } from "vue";
+import appTemplate from "./App.vue";
 import "./assets/style.css";
 import { ScopeInjectionKey } from "./utils/ScopeInjectionKey";
 
-const components = import.meta.glob("./components/**/*.vue", { import: "default" });
+const components = import.meta.glob("./components/**/*.vue", {
+	import: "default"
+});
 
 interface InspectorOptions {
-	scope: Scope;
-	element: HTMLElement;
+	scope?: Scope;
+	element?: HTMLElement | null;
 }
-export default function createInspector(options: InspectorOptions) {
+export default function createInspector(options?: InspectorOptions) {
 	const app = createApp(appTemplate);
-	app.provide(ScopeInjectionKey, options.scope);
+	// @ts-expect-error
+	const scope = options?.scope ?? globalThis.__ECS__;
+
+	if (!scope) throw new Error("Scope not provided");
+
+	app.provide(ScopeInjectionKey, scope);
 
 	const container = document.createElement("aside");
 	container.dataset.theme = "dark";
 	container.id = "inspector";
-	options.element.appendChild(container);
+
+	const element = options?.element ?? document.body;
+	element.appendChild(container);
 
 	for (const [name, component] of Object.entries(components)) {
 		const componentName = parseComponentName(name);
-		console.log(componentName);
 		app.component(componentName, defineAsyncComponent(component as any));
 	}
 
@@ -32,5 +40,14 @@ function parseComponentName(path: string) {
 	// remove initial dot and `components`, then split on /
 	const parts = path.split("/").slice(2);
 
-	return 'scout-' + parts.map(x => x.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase().trim()).join("-").replace(/\.vue$/, '');
+	const name = parts
+		.map(x =>
+			x
+				.replace(/([a-z])([A-Z])/g, "$1-$2")
+				.toLowerCase()
+				.trim()
+		)
+		.join("-");
+
+	return `dacite-${name}`.replace(/\.vue$/, "");
 }

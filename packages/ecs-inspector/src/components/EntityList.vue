@@ -6,48 +6,63 @@ export interface Props {
 }
 const { entities } = defineProps<Props>();
 const query = ref("");
+// biome-ignore lint: This is more readable.
+const emit = defineEmits<{ (event: "click", entity: Entity): void }>();
 
 const filteredEntities = computed(() => {
-	if(!query.value)
-		return entities;
+	if (!query.value) return entities;
 
-	if(!Number.isNaN(Number(query.value)))
-		return entities.filter((entity) => entity.id === Number(query.value));
+	if (!Number.isNaN(Number(query.value)))
+		return entities.filter(entity => entity.id === Number(query.value));
 
-	return entities.filter((entity) => {
-			return entity.name.toLowerCase().includes(query.value.toLowerCase());
+	return entities.filter(entity => {
+		return entity.name.toLowerCase().includes(query.value.toLowerCase());
 	});
 });
 </script>
 
 <template>
-	<scout-textbox placeholder="Search for entities" v-model="query" />
-	<ul>
-		<li v-for="entity of filteredEntities" :key="entity.id">
-			<span class="id">{{ entity.id }}</span> {{ entity.name }}
-		</li>
-	</ul>
+	<div class="entity-list">
+		<dacite-textbox placeholder="Search for entities" v-model="query" />
+		<ul>
+			<li v-for="entity of filteredEntities" :key="entity.id" >
+				<button @click="emit('click', entity)">
+					<dacite-badge>{{ entity.id }}</dacite-badge> {{ entity.name }}
+				</button>
+			</li>
+		</ul>
+	</div>
 </template>
 <style scoped>
-	ul {
-		padding-left: 0;
-		list-style: none;
-	}
+.entity-list {
+	display: grid;
+	grid-column: full;
+	grid-template-columns: subgrid;
+}
 
-	li {
-		padding: 0.25rem;
-		border-radius: var(--border-radius);
-	}
+.entity-list > * {
+	grid-column: main;
+}
 
-	li:hover {
-		background-color: var(--surface-2);
-	}
+ul {
+	padding-left: 0;
+	list-style: none;
+}
 
-	.id {
-		font-size: 0.75rem;
-		background-color: var(--brand);
-		color: var(--text-1);
-		padding: 0 0.25em;
-		border-radius: var(--border-radius);
-	}
+button {
+	padding: 0.25rem;
+	border-radius: var(--border-radius);
+	background: none;
+	display: block;
+	width: 100%;
+	text-align: start;
+	border: none;
+	font: inherit;
+	font-size: inherit;
+	color: inherit;
+}
+
+button:hover, button:focus-visible {
+	background-color: var(--surface-2);
+}
 </style>

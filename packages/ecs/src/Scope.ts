@@ -1,13 +1,12 @@
 import Entity from "./entities/Entity";
 import type IUpdatingSystem from "./systems/IUpdatingSystem";
 import System from "./systems/System";
+import { OrderedSet } from "./utils";
 import ComponentParser from "./utils/ComponentParser";
 import "./utils/DevtoolsFormatters";
 import EventBus from "./utils/EventBus";
 import SparseSet from "./utils/SparseSet";
-import type { ClassInstance, Type } from "./utils/Types";
-
-type ComponentType<T = unknown> = Type<T> | symbol;
+import type { ClassInstance, ComponentType, Type } from "./utils/Types";
 
 interface GetComponentSetOptions {
 	/**
@@ -19,6 +18,11 @@ interface GetComponentSetOptions {
 export const WORLD_ENTITY = Symbol("World entity");
 export const NAME_SYMBOL = Symbol.for("Name");
 export const TAG_SYMBOL = Symbol.for("Tags");
+
+interface ScopeOptions {
+	debug?: boolean;
+}
+
 export default class Scope {
 	private _world;
 	/**
@@ -33,12 +37,17 @@ export default class Scope {
 	 *	@internal
 	 * Contains all sparse sets for each component type.
 	 */
-	public readonly components = new Map<ComponentType, SparseSet<unknown>>();
+	public readonly components = new Map<
+		ComponentType<unknown>,
+		SparseSet<unknown>
+	>();
 	/**
 	 * Contains all systems registered into this scope.
 	 */
 	private readonly systems = new Set<System>();
-	private readonly updatingSystems = new Set<IUpdatingSystem>();
+	private readonly updatingSystems = new OrderedSet<IUpdatingSystem>(
+		"priority"
+	);
 
 	public updateTiming = 0;
 
@@ -56,11 +65,11 @@ export default class Scope {
 		return this._world;
 	}
 
-	constructor({ debug } = { debug: false }) {
+	constructor(options: ScopeOptions = { debug: false }) {
 		this.components.set(NAME_SYMBOL, new SparseSet<string>());
 		this._world = this.entity("world").set(WORLD_ENTITY);
 
-		if (debug) {
+		if (options?.debug) {
 			this.eventbus.on("*", console.log);
 		}
 	}
@@ -145,7 +154,7 @@ export default class Scope {
 	 * @param type Component type to get
 	 * @param options
 	 */
-	public getComponentSet<T extends ClassInstance>(
+	public getComponentSet<T>(
 		type: Type<T> | symbol,
 		options?: GetComponentSetOptions
 	): SparseSet<T>;
@@ -153,11 +162,11 @@ export default class Scope {
 		type: symbol,
 		options?: GetComponentSetOptions
 	): SparseSet<symbol>;
-	public getComponentSet<T extends ClassInstance>(
+	public getComponentSet<T>(
 		type: Type<T>,
 		options?: GetComponentSetOptions
 	): SparseSet<T>;
-	public getComponentSet<T extends ClassInstance>(
+	public getComponentSet<T>(
 		type: Type<T> | symbol,
 		options?: GetComponentSetOptions
 	) {
@@ -207,13 +216,31 @@ export default class Scope {
 
 		if (onEnable instanceof Promise) {
 			onEnable.then(() => {
-				this.updatingSystems.add(system);
+				this.updatingSystems.add(system, system.priority ?? 0);
 			});
 			return this;
 		}
 
-		this.updatingSystems.add(system);
+		this.updatingSystems.add(system, system.priority ?? 0);
+
+		console.log(
+			"-" +
+				[...this.updatingSystems]
+					.map(x => `${x.constructor.name} ${x.priority}`)
+					.join("\n-")
+		);
+
 		return this;
+	}
+
+	/** */
+	public getSystem<T extends System>(type: Type<T>): T | null {
+		for (const system of this.systems) {
+			if (system instanceof type) {
+				return system as T;
+			}
+		}
+		return null;
 	}
 
 	/**

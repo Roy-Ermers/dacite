@@ -1,5 +1,5 @@
+import { ComponentSymbols } from "../index";
 import type { ClassInstance, Type } from "../utils/Types";
-import ComponentSymbols from "./ComponentSymbols";
 
 /**
  * A set of components, allows you to assign more than one of the same components to a entity.

@@ -37,7 +37,6 @@ export default abstract class EntitySystem extends System {
 
 		this.iteratorEntity ??= new Entity(0, this.scope);
 
-		console.log(...this.query.execute(this.scope));
 		for (const id of this.query.ids(this.scope)) {
 			this._entities.add(id);
 			this.iteratorEntity.id = id;

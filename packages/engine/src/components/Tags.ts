@@ -1,1 +1,0 @@
-export const CAMERA_FOCUS = 'camera_focus';

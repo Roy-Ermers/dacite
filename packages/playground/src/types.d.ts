@@ -1,6 +1,5 @@
-import Scope from "@dacite/ecs";
+import type { Scope } from "@dacite/ecs";
 
 declare global {
 	var scope: Scope;
 }
-export{}

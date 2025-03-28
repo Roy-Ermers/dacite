@@ -1,5 +1,10 @@
 import { NAME_SYMBOL, type default as Scope } from "../Scope";
-import type { Append, ClassInstance, Type } from "../utils/Types";
+import type {
+	Append,
+	ClassInstance,
+	ComponentType,
+	Type
+} from "../utils/Types";
 
 export type EntityComponentType<S, T> = S extends T ? T : T | null;
 
@@ -86,9 +91,7 @@ export default class Entity<S = unknown> {
 	 * @param componentType The component type to get
 	 * @returns the component that matches T or null
 	 */
-	get<T extends ClassInstance>(
-		componentType: Type<T>
-	): EntityComponentType<S, T> {
+	get<T>(componentType: ComponentType<T>): EntityComponentType<S, T> {
 		const set = this.scope.getComponentSet(componentType);
 		if (!set) return null as EntityComponentType<S, T>;
 
@@ -212,6 +215,14 @@ export default class Entity<S = unknown> {
 			if (set.has(this.id)) {
 				yield set.get(this.id);
 			}
+		}
+	}
+
+	*entries(): Generator<readonly [ComponentType, unknown], void, unknown> {
+		for (const [type, set] of this.scope.components) {
+			const component = set.get(this.id);
+
+			if (component) yield [type, set.get(this.id)] as const;
 		}
 	}
 

@@ -1,0 +1,55 @@
+{
+	"name": "@dacite/core",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"build": "vite build"
+	},
+	"exports": {
+		".": {
+			"source": "./src/index.ts",
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
+		},
+		"./components": {
+			"source": "./src/components/index.ts",
+			"types": "./dist/components/index.d.ts",
+			"import": "./dist/components/index.mjs"
+		},
+		"./systems": {
+			"source": "./src/systems/index.ts",
+			"types": "./dist/systems/index.d.ts",
+			"import": "./dist/systems/index.mjs"
+		},
+		"./tiles": {
+			"source": "./src/tiles/index.ts",
+			"types": "./dist/tiles/index.d.ts",
+			"import": "./dist/tiles/index.mjs"
+		},
+		"./utils": {
+			"source": "./src/utils/index.ts",
+			"types": "./dist/utils/index.d.ts",
+			"import": "./dist/utils/index.mjs"
+		}
+	},
+	"main": "./dist/index.mjs",
+	"files": ["src", "dist"],
+	"devDependencies": {
+		"gl": "^8.1.6",
+		"typescript": "^5.7.3",
+		"vite": "^6.2.3",
+		"vite-plugin-dts": "^4.5.3"
+	},
+	"overrides": {
+		"pixijs": {
+			"gl": "latest"
+		}
+	},
+	"dependencies": {
+		"@dacite/ecs": "*",
+		"p2-es": "^1.2.3",
+		"pixi.js": "^8.6.6",
+		"tick-knock": "^4.3.0"
+	}
+}

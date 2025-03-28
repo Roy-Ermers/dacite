@@ -1,6 +1,6 @@
 {
 	"name": "@dacite/ecs",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"type": "module",
 	"scripts": {
 		"build": "unbuild",
@@ -8,10 +8,14 @@
 	},
 	"exports": {
 		".": {
+			"source": "./src/index.ts",
+			"types": "./dist/index.d.ts",
 			"import": "./dist/index.mjs"
 		},
 		"./utils": {
-			"import": "./dist/utils/index.mjs"
+			"source": "./src/utils/index.ts",
+			"import": "./dist/utils/index.mjs",
+			"types": "./dist/utils/index.d.ts"
 		}
 	},
 	"main": "./dist/index.mjs",
@@ -19,9 +23,17 @@
 	"files": ["src", "dist"],
 	"license": "ISC",
 	"keywords": ["ecs", "entity-component-system"],
+	"unbuild": {
+		"entries": [
+			{
+				"builder": "mkdist",
+				"input": "src"
+			}
+		],
+		"declaration": true
+	},
 	"devDependencies": {
-		"mkdist": "^2.2.0",
-		"typescript": "^5.7.3",
+		"typescript": "^5.8.2",
 		"unbuild": "^3.5.0"
 	},
 	"dependencies": {

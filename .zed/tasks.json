@@ -1,0 +1,13 @@
+// Static tasks configuration.
+//
+// Example:
+[
+	{
+		"label": "Run dev",
+		"command": "npm run dev",
+		"allow_concurrent_runs": false,
+		"reveal": "no_focus",
+		"hide": "on_success",
+		"shell": "system"
+	}
+]

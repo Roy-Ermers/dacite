@@ -16,3 +16,8 @@ export interface Type<T = ClassInstance> extends Function {
  * Append a type to another type.
  */
 export type Append<T, U> = T extends null ? U : T & U;
+
+/**
+ * Represents all component types.
+ */
+export type ComponentType<T> = Type<T> | symbol;

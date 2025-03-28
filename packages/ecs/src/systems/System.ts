@@ -9,6 +9,14 @@ export default abstract class System {
 	}
 
 	/**
+	 * The priority of this system.
+	 * Higher priority systems are updated first.
+	 */
+	get priority(): number {
+		return 0;
+	}
+
+	/**
 	 *	@internal
 	 * Enables this system and adds it to a scope.
 	 * It is internal because it should not be used outside of this package.

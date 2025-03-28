@@ -11,6 +11,7 @@
 		"isolatedModules": true,
 		"emitDeclarationOnly": true,
 		"allowImportingTsExtensions": true,
+		"customConditions": ["source"],
 
 		/* Linting */
 		"strict": true,

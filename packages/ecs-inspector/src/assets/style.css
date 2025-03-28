@@ -44,8 +44,11 @@
 	width: max(25vw, 30rem);
 	display: grid;
 	grid-template-columns: [full-start] 0.5rem [main-start] 1fr [main-end] 0.5rem [full-end];
+	grid-auto-flow: row;
+	grid-auto-rows: auto;
 	place-content: start;
 	font-family: monospace;
+	max-height: 100%;
 	font-size: 0.875rem;
 	background-color: var(--surface-1);
 	border: 1px solid var(--surface-2);
@@ -53,9 +56,15 @@
 	box-shadow: var(--surface-shadow);
 	border-start-start-radius: var(--border-radius);
 	border-end-start-radius: var(--border-radius);
-	overflow: auto;
-	overflow-x: clip;
-	transition: inset-inline-end 500ms cubic-bezier(0.19, 1, 0.22, 1);
+	transition: inset-inline-end 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+#inspector::before {
+	content: "";
+	position: absolute;
+	width: 2.5rem;
+	height: 100%;
+	inset-inline-start: -2.5rem;
 }
 
 :where(#inspector > *) {

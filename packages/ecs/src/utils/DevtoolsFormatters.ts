@@ -1,7 +1,6 @@
 import ComponentSet from "../components/ComponentSet";
 import Entity from "../entities/Entity";
-import type { Type } from "./Types";
-
+import getComponentName from "./getComponentName";
 declare global {
 	interface CustomFormatter {
 		header: (obj: unknown) => JSONML | null;
@@ -60,18 +59,6 @@ class ComponentSetFormatter implements CustomFormatter {
 	}
 }
 
-function getTypeName(variable: unknown) {
-	if (typeof variable === "symbol") {
-		return variable.description;
-	}
-
-	if (typeof variable === "function") {
-		return variable.name;
-	}
-
-	return (variable as Type).constructor.name;
-}
-
 class EntityFormatter implements CustomFormatter {
 	header(variable: unknown) {
 		if (!(variable instanceof Entity)) return null;
@@ -106,7 +93,7 @@ class EntityFormatter implements CustomFormatter {
 				[
 					"td",
 					{ style: "color: pink; vertical-align: top" },
-					getTypeName(type)
+					getComponentName(type)
 				],
 				["td", {}, ["object", { object: set.get(variable.id) }]]
 			]);
