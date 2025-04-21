@@ -12,12 +12,18 @@ import { CAMERA_FOCUS } from "../components/Tags";
 
 export default class CameraSystem extends EntitySystem {
 	public speed = 0.5;
-	public targetZoom = 1;
-	private currentZoom = 1;
+	public targetZoom = 3;
+	private currentZoom = 3;
 	private currentPosition = Vector2.zero;
 
 	get query() {
 		return new Query().has(CAMERA_FOCUS).has(Transform);
+	}
+
+	override onEnable(): Promise<void> | void {
+		super.onEnable();
+
+		Engine.instance.renderSystem.scene.scale.set(this.currentZoom);
 	}
 
 	protected override onEntityUpdated(
@@ -33,13 +39,19 @@ export default class CameraSystem extends EntitySystem {
 		);
 
 		if (Math.abs(this.currentZoom - this.targetZoom) > 0.01) {
-			this.currentZoom = lerp(this.currentZoom, this.targetZoom, this.speed);
+			this.currentZoom = lerp(
+				this.currentZoom,
+				this.targetZoom,
+				Engine.instance.time.deltaTime / Math.max(1, Math.log(this.currentZoom))
+			);
 
 			scene.scale.set(this.currentZoom);
 		}
 
-		const distance = this.currentPosition.distance(transform.position);
-		this.currentPosition = this.currentPosition.lerp(transform.position, 0.5);
+		this.currentPosition = this.currentPosition.lerp(
+			transform.position,
+			Engine.instance.time.deltaTime
+		);
 
 		scene.position.set(
 			canvas.clientWidth / 2 - this.currentPosition.x * this.currentZoom,

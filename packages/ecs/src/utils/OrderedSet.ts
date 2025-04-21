@@ -45,7 +45,6 @@ export default class OrderedSet<T> {
 	public add(item: T, priority: number): void;
 	public add(item: T, _priority?: number) {
 		const priority = _priority ?? item[this.sortField];
-		console.log(item.constructor.name, priority);
 
 		if (!this.items) {
 			this.items = { item, next: null };

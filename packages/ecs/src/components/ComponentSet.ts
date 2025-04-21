@@ -1,5 +1,7 @@
-import { ComponentSymbols } from "../index";
 import type { ClassInstance, Type } from "../utils/Types";
+import { ComponentTypeSymbol } from "./ComponentSymbols";
+// Annoying way but has to be like this for typescript to support external modules.
+const symbol = ComponentTypeSymbol;
 
 /**
  * A set of components, allows you to assign more than one of the same components to a entity.
@@ -21,9 +23,8 @@ import type { ClassInstance, Type } from "../utils/Types";
  *   console.log(force.direction);
  *	}
  */
-export default class ComponentSet<T extends ClassInstance> {
+export default class ComponentSet<T extends ClassInstance = object> {
 	private components: T[] = [];
-	private ids = new Map<T, number>();
 
 	static create<T extends ClassInstance>(
 		type: Type<T>
@@ -32,14 +33,14 @@ export default class ComponentSet<T extends ClassInstance> {
 		const incubator = {
 			[name]: class extends ComponentSet<T> {}
 		};
-		return incubator[name];
+		return incubator[name] as typeof ComponentSet<T>;
 	}
 
 	get size() {
 		return this.components.length;
 	}
 
-	static [ComponentSymbols.componentType]() {
+	static [symbol]() {
 		// biome-ignore lint: We actually want to return the class type itself here.
 		return this;
 	}
@@ -54,32 +55,36 @@ export default class ComponentSet<T extends ClassInstance> {
 		return this.components[Symbol.iterator]();
 	}
 
-	add(component: T): void;
-	add(component: T, index: number): void;
-	add(component: T, _index?: number) {
-		const index = _index ?? this.indexOf(component);
+	/**
+	 * Add a new component to this set.
+	 * @param component Component to add
+	 */
+	add(component: T) {
+		const index = this.components.indexOf(component);
 
-		if (index !== undefined) {
+		if (index >= 0) {
 			this.components[index] = component;
 			return;
 		}
 
-		const newIndex = this.components.push(component);
-		this.ids.set(component, newIndex);
+		this.components.push(component);
 	}
 
-	indexOf(component: T) {
-		return this.ids.get(component);
-	}
-
+	/**
+	 * Check if this set contains a component.
+	 * @param component Component to check
+	 */
 	has(component: T): boolean {
-		return this.components.some(x => component === x);
+		return this.components.includes(component);
 	}
 
 	delete(component: T) {
 		const index = this.components.findIndex(x => x === component);
-		this.components.splice(index, 1);
-		this.ids.delete(component);
+		const [deletedComponent] = this.components.splice(index, 1);
+	}
+
+	find(predicate: (value: T) => boolean) {
+		return this.components.find(predicate);
 	}
 
 	[Symbol.iterator]() {

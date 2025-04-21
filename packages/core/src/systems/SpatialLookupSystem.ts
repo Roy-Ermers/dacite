@@ -3,6 +3,9 @@ import Transform from "../components/Transform.js";
 import SpatialMap from "../utils/SpatialMap.js";
 
 export default class SpatialLookupSystem extends EntitySystem {
+	override get priority() {
+		return 9999;
+	}
 	get query() {
 		return new Query().has(Transform);
 	}

@@ -78,7 +78,7 @@ export default class Vector2 {
 
 	normalize(dest?: Vector2) {
 		dest ??= new Vector2();
-		if (this.length == 0) return this;
+		if (this.length === 0) return this;
 		return this.divide(this.length, this.length, dest);
 	}
 

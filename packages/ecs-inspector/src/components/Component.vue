@@ -16,6 +16,10 @@ const componentBaseType = computed(() =>
 );
 const expanded = ref(false);
 const id = useId();
+
+const fields = computed(() => {
+	return Object.keys(props.data).filter(x => !x.startsWith("_"));
+});
 </script>
 <template>
 	<button
@@ -33,7 +37,7 @@ const id = useId();
 	<transition>
 		<div v-show="expanded" class="details" :id="id">
 			<dacite-field
-				v-for="key in Object.keys(data)"
+				v-for="key in fields"
 				v-model="data[key]"
 				:key
 				:name="key"

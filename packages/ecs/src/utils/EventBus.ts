@@ -3,6 +3,10 @@ type EventDefinition = Record<string, EventHandler>;
 // biome-ignore lint: We don't care about the argument types.
 type EventHandler = (...args: any[]) => void;
 
+interface EventOptions {
+	once?: boolean;
+}
+
 /**
  * A simple event bus that allows you to listen for events and emit them.
  */
@@ -41,12 +45,21 @@ export default class EventBus<T extends EventDefinition> {
 		listenerSet.add(listener);
 
 		const off = () => {
-			this.off(event as K | "*", listener);
+			this.off(event, listener);
 		};
 
 		off[Symbol.dispose] = off;
 
 		return off;
+	}
+
+	once<K extends keyof T>(event: K, listener: T[K]) {
+		const onceListener = (...args: Parameters<T[K]>) => {
+			this.off(event as K, onceListener as T[K]);
+			listener(...args);
+		};
+
+		this.on(event as K, onceListener as T[K]);
 	}
 
 	/**

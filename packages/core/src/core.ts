@@ -1,11 +1,13 @@
 import { Scope } from "@dacite/ecs";
 import { TextureSource } from "pixi.js";
+import Time from "./Time";
 import InputSystem from "./systems/InputSystem";
 import RenderSystem from "./systems/RenderSystem";
 import SpatialLookupSystem from "./systems/SpatialLookupSystem";
 
 interface EngineOptions {
 	canvas?: HTMLCanvasElement;
+	renderSystem?: RenderSystem;
 	debug?: boolean;
 }
 
@@ -16,13 +18,20 @@ export default class Engine {
 	// biome-ignore lint: This will be defined in the constructor
 	renderSystem: RenderSystem = null!;
 
-	public get elapsedTime() {
-		return Date.now() - this.timeStart;
+	// biome-ignore lint: This will be defined in the constructor
+	private _canvas: HTMLCanvasElement = null!;
+
+	public get canvas() {
+		return this._canvas;
+	}
+
+	private _time: Time;
+
+	public get time() {
+		return this._time;
 	}
 
 	public readonly ecs = new Scope();
-
-	private timeStart = 0;
 
 	constructor() {
 		if (Engine.instance) {
@@ -30,6 +39,10 @@ export default class Engine {
 		}
 
 		Engine.instance = this;
+
+		this._time = new Time(() => {
+			this.ecs.update();
+		});
 
 		TextureSource.defaultOptions.scaleMode = "nearest";
 		TextureSource.defaultOptions.mipmapFilter = "nearest";
@@ -47,17 +60,14 @@ export default class Engine {
 			this.ecs.eventbus.on("*", (...args) => console.log("⚡", ...args));
 		}
 
-		this.timeStart = Date.now();
-		const canvas =
+		this._canvas =
 			options?.canvas ??
 			document.body.appendChild(document.createElement("canvas"));
 
-		this.renderSystem = new RenderSystem({
-			canvas
-		});
+		this.renderSystem = options?.renderSystem ?? new RenderSystem();
 
 		this.ecs
-			.addSystem(new InputSystem(canvas))
+			.addSystem(new InputSystem(this._canvas))
 			.addSystem(this.renderSystem)
 			.addSystem(new SpatialLookupSystem());
 	}

@@ -9,6 +9,7 @@ import {
 	BoxCollider,
 	CircleCollider,
 	Collider,
+	PlaneCollider,
 	Transform
 } from "../components";
 import Engine from "../core.ts";
@@ -18,7 +19,9 @@ export default class CollisionDebuggerSystem extends EntitySystem {
 		return new Query().has(Collider).has(Transform);
 	}
 
-	selectedEntity: Entity | null = null;
+	override get priority() {
+		return 999;
+	}
 
 	graphics: Container;
 	colliderDrawer = new WeakMap<Collider, Graphics>();
@@ -63,17 +66,20 @@ export default class CollisionDebuggerSystem extends EntitySystem {
 		this.colliderDrawer.set(collider, graphics);
 		this.graphics.addChild(graphics);
 
+		graphics.strokeStyle.color = collider.isSensor ? 0x00ff00 : 0xff0000;
+
 		if (collider instanceof BoxCollider) {
-			graphics.strokeStyle.color = 0xff0000;
 			graphics.pivot.set(collider.width / 2, collider.height / 2);
 			graphics.rect(0, 0, collider.width, collider.height);
 			graphics.stroke();
-		}
-
-		if (collider instanceof CircleCollider) {
-			graphics.strokeStyle.color = 0x00ff00;
+		} else if (collider instanceof CircleCollider) {
 			graphics.circle(0, 0, collider.radius);
 			graphics.stroke();
+		} else if (collider instanceof PlaneCollider) {
+			graphics
+				.moveTo(collider.start.x, collider.start.y)
+				.lineTo(collider.end.x, collider.end.y)
+				.stroke();
 		}
 	}
 

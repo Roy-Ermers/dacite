@@ -1,4 +1,5 @@
 import { NAME_SYMBOL, type default as Scope } from "../Scope";
+import type ComponentSet from "../components/ComponentSet";
 import type {
 	Append,
 	ClassInstance,
@@ -99,6 +100,18 @@ export default class Entity<S = unknown> {
 	}
 
 	/**
+	 * Get or create a componentSet on this entity
+	 */
+	getComponentSet<T extends ComponentSet>(componentType: Type<T>): T {
+		const set = this.scope.getComponentSet(componentType)?.get(this.id);
+		if (set) return set as T;
+
+		const componentSet = new componentType();
+		this.set(componentSet);
+		return componentSet;
+	}
+
+	/**
 	 * # ! Use with caution, this is not a cheap operation. !
 	 *
 	 * Get all components assigned to this entity.
@@ -162,6 +175,32 @@ export default class Entity<S = unknown> {
 	}
 
 	/**
+	 * Toggle a tag on the entity
+	 * @param tag tag to toggle
+	 */
+	toggleTag(tag: symbol): boolean;
+	/**
+	 * Toggle a tag on the entity
+	 * @param tag tag to toggle
+	 * @param force force the tag to be set or removed
+	 */
+	toggleTag(tag: symbol, force: boolean): boolean;
+	toggleTag(tag: symbol, force?: boolean) {
+		const tags = this.scope.getTagSet();
+		const existingTags = tags.get(this.id);
+		const toggle = force ?? !existingTags?.has(tag);
+
+		if (existingTags) {
+			if (toggle) {
+				existingTags.add(tag);
+			} else {
+				existingTags.delete(tag);
+			}
+		}
+
+		return toggle;
+	}
+	/**
 	 * Check if this entity has a tag
 	 * @param tag Tag to check for
 	 * @returns a boolean
@@ -205,6 +244,8 @@ export default class Entity<S = unknown> {
 		if (typeof type !== "function") type = component.constructor as Type<T>;
 
 		const set = this.scope.getComponentSet(type);
+
+		if (!set) return;
 		set.delete(this.id);
 		this.scope.eventbus.emit("componentremoved", this, component);
 		return this as unknown as Entity<Extract<T, S>>;

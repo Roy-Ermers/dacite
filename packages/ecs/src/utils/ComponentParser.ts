@@ -1,4 +1,4 @@
-import ComponentSymbols from "../components/ComponentSymbols";
+import { ComponentTypeSymbol } from "../components/ComponentSymbols.ts";
 import type { Type } from "./Types";
 
 const typeCache: Map<
@@ -7,18 +7,20 @@ const typeCache: Map<
 > = new Map();
 
 export interface ComponentTypeSymbolConstructor {
-	[ComponentSymbols.componentType](): Type;
+	[ComponentTypeSymbol](): Type;
 }
 
 function hasComponentType(
 	component: unknown
 ): component is ComponentTypeSymbolConstructor {
-	if (typeof component !== "object" || !component) {
+	if (!component) {
 		return false;
 	}
 
-	if (ComponentSymbols.componentType in component)
-		return typeof component[ComponentSymbols.componentType] === "function";
+	// biome-ignore lint: typescript doesn't handle in parameter for functions.
+	const anyComponent = component as any;
+	if (ComponentTypeSymbol in anyComponent)
+		return typeof anyComponent[ComponentTypeSymbol] === "function";
 
 	return false;
 }
@@ -30,7 +32,7 @@ function parseBaseComponentType<
 	// walk up the prototype chain to find the first class with a component type or the base class
 	while (type.name !== "") {
 		if (hasComponentType(type)) {
-			return type[ComponentSymbols.componentType]();
+			return type[ComponentTypeSymbol]();
 		}
 		const newType = Object.getPrototypeOf(type);
 

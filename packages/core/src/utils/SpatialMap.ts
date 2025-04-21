@@ -65,9 +65,6 @@ export default class SpatialMap {
 		const oldBucketHash = this.entities.get(entity.id);
 
 		if (oldBucketHash && oldBucketHash !== minHash) {
-			console.log(
-				`Moving entity ${entity.id} from ${oldBucketHash} to ${minHash}`
-			);
 			const oldBucket = this.buckets.get(oldBucketHash);
 
 			oldBucket?.delete(entity.id);

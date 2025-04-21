@@ -1,27 +1,29 @@
 import Engine, {
 	BoxCollider,
-	Collider,
+	CircleCollider,
 	Renderable,
 	Rigidbody,
 	Transform,
 	Vector2
 } from "@dacite/core";
-import { PhysicsSystem } from "@dacite/core/systems";
+import { PlanckPhysicsSystem, RenderSystem } from "@dacite/core/systems";
 import createInspector from "@dacite/ecs-inspector";
 import { Sprite } from "pixi.js";
-import ComponentParser from "../../ecs/src/utils/ComponentParser.ts";
+import PlaneCollider from "../../core/src/components/colliders/PlaneCollider.ts";
+import { HEART } from "./components/Tags.ts";
 import createPlayer from "./entities/Player.ts";
 import Resources from "./resources/Resources.ts";
 import CameraSystem from "./systems/CameraSystem.ts";
+import HeartSystem from "./systems/HeartSystem.ts";
 import PlayerControllerSystem from "./systems/PlayerControllerSystem.ts";
 
 const game = new Engine();
 
 async function init() {
-	const canvas = document.querySelector<HTMLCanvasElement>("#gameCanvas");
-	if (!canvas) throw new Error("Canvas not found");
 	await game.init({
-		canvas
+		renderSystem: new RenderSystem({
+			backgroundColor: 0xffccaa
+		})
 	});
 
 	await Resources.load();
@@ -31,30 +33,61 @@ async function init() {
 	game.ecs
 		.addSystem(new CameraSystem())
 		.addSystem(new PlayerControllerSystem())
-		.addSystem(new PhysicsSystem({ gravity: Vector2.zero }));
+		.addSystem(new PlanckPhysicsSystem({ gravity: new Vector2(0, -9.78) }))
+		.addSystem(new HeartSystem());
 
 	createPlayer(game.ecs);
 
-	console.log(ComponentParser.getBaseComponentType(Collider));
+	game.ecs
+		.entity("heart")
+		.set(new Transform(new Vector2(-32, 0)))
+		.set(
+			new Renderable(
+				Sprite.from(Resources.Resources.Spritesheet.textures.heart_empty),
+				-1
+			)
+		)
+		.set(BoxCollider.Sensor(8, 8))
+		.set(HEART);
 
 	for (let i = 0; i < 10; i++) {
-		const player = Sprite.from(
-			Resources.Resources.TileSpritesheet.textures.wall
+		const balloon = Sprite.from(
+			Resources.Resources.Spritesheet.textures.balloon
 		);
 		game.ecs
-			.entity(`wall ${i}`)
-			.set(new Transform(Vector2.random.multiply(128, 128)))
-			.set(new Renderable(player))
-			.set(new Rigidbody({ type: "dynamic", mass: 1000 }))
-			.set(new BoxCollider(16, 16));
+			.entity(`balloon ${i}`)
+			.set(new Transform(new Vector2(64 - Math.random() * 128, 16)))
+			.set(new Renderable(balloon))
+			.set(new Rigidbody({ type: "dynamic" }))
+			.set(
+				new CircleCollider(4)
+					.withDensity(1)
+					.withFriction(1)
+					.withRestitution(0.75)
+			);
 	}
 
-	function update() {
-		game.ecs.update();
-		requestAnimationFrame(update);
+	for (let i = 0; i < 50; i++) {
+		game.ecs
+			.entity()
+			.set(new Transform(new Vector2((i - 25) * 8, 8)))
+			.set(
+				new Renderable(
+					Sprite.from(Resources.Resources.Spritesheet.textures.wall_top),
+					-1
+				)
+			);
 	}
-
-	update();
+	game.ecs
+		.entity("floor")
+		.set(new Transform(new Vector2(0, -4)))
+		.set(new Rigidbody({ type: "static" }))
+		.set(
+			new PlaneCollider(
+				new Vector2(-25 * 8, 0),
+				new Vector2(25 * 8, 0)
+			).withFriction(1)
+		);
 }
 
 init();

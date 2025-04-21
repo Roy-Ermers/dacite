@@ -1,4 +1,4 @@
-import { Renderable, Transform } from "@dacite/core";
+import Engine, { Renderable, Transform } from "@dacite/core";
 import {
 	type Entity,
 	EntitySystem,
@@ -22,6 +22,10 @@ export default class RenderSystem extends EntitySystem {
 	private renderOptions: Partial<AutoDetectOptions>;
 	private observer: ResizeObserver;
 
+	override get priority() {
+		return -1;
+	}
+
 	get query() {
 		return new Query().has(Renderable).has(Transform);
 	}
@@ -35,9 +39,9 @@ export default class RenderSystem extends EntitySystem {
 	override async onEnable() {
 		await super.onEnable();
 
-		this.canvas =
-			(this.renderOptions.canvas as HTMLCanvasElement) ??
-			document.body.appendChild(document.createElement("canvas"));
+		this.canvas = Engine.instance.canvas;
+		this.canvas.tabIndex = 0;
+		this.canvas.focus();
 
 		this.observer.observe(this.canvas);
 
@@ -78,6 +82,8 @@ export default class RenderSystem extends EntitySystem {
 		const renderable = entity.get(Renderable);
 		this.scene.addChild(renderable.container);
 		renderable.container.label = entity.name;
+		if (renderable.zIndex !== null)
+			renderable.container.zIndex = renderable.zIndex;
 	}
 
 	protected override onEntityRemoved(
@@ -92,6 +98,15 @@ export default class RenderSystem extends EntitySystem {
 	) {
 		const renderable = entity.get(Renderable);
 		const transform = entity.get(Transform);
+
+		if (renderable.dirty) {
+			const original = renderable.container;
+			original.removeFromParent();
+			renderable.container = renderable.texture;
+			if (renderable.zIndex) renderable.container.zIndex = renderable.zIndex;
+			this.scene.addChild(renderable.texture);
+			renderable.dirty = false;
+		}
 
 		renderable.container.position.set(
 			transform.position.x,

@@ -223,13 +223,6 @@ export default class Scope {
 
 		this.updatingSystems.add(system, system.priority ?? 0);
 
-		console.log(
-			"-" +
-				[...this.updatingSystems]
-					.map(x => `${x.constructor.name} ${x.priority}`)
-					.join("\n-")
-		);
-
 		return this;
 	}
 

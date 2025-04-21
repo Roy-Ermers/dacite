@@ -1,7 +1,3 @@
-export const componentType: unique symbol = Symbol("component type");
+export const ComponentTypeSymbol: unique symbol = Symbol.for("component-type");
 
-export type ComponentTypeSymbol = typeof componentType;
-
-export default {
-	componentType: componentType as ComponentTypeSymbol
-};
+export type ComponentType = typeof ComponentTypeSymbol;
