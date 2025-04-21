@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BUILD_PATH: "./packages/playground/"
+  BUILD_PATH: "./packages/playground"
 
 jobs:
   build:
@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: "20"
           cache: ${{ steps.detect-package-manager.outputs.manager }}
-          cache-dependency-path: ${{ env.BUILD_PATH }}/${{ steps.detect-package-manager.outputs.lockfile }}
+          cache-dependency-path: ./${{ steps.detect-package-manager.outputs.lockfile }}
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
