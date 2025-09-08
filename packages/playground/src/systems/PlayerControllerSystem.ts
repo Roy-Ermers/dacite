@@ -7,7 +7,6 @@ import {
 	Impulse,
 	Rigidbody
 } from "@dacite/core/components";
-import { InputSystem } from "@dacite/core/systems";
 import { Vector2 } from "@dacite/core/utils";
 import {
 	type Entity,
@@ -56,13 +55,13 @@ export default class PlayerControllerSystem extends EntitySystem {
 	 */
 	private getInputDirection(): Vector2 {
 		const direction = Vector2.zero;
-		if (InputSystem.instance.isDown("s")) {
+		if (Engine.$.inputSystem.isDown("s")) {
 			direction.y -= 1;
 		}
-		if (InputSystem.instance.isDown("a")) {
+		if (Engine.$.inputSystem.isDown("a")) {
 			direction.x -= 1;
 		}
-		if (InputSystem.instance.isDown("d")) {
+		if (Engine.$.inputSystem.isDown("d")) {
 			direction.x += 1;
 		}
 
@@ -90,8 +89,7 @@ export default class PlayerControllerSystem extends EntitySystem {
 		const remainingCoyoteTime = isGrounded
 			? this.coyoteTime
 			: Math.max(
-					(this.coyoteTimer.get(entityId) ?? 0) -
-						Engine.instance.time.deltaTime,
+					(this.coyoteTimer.get(entityId) ?? 0) - Engine.$.time.deltaTime,
 					0
 				);
 		this.coyoteTimer.set(entityId, remainingCoyoteTime);
@@ -100,7 +98,7 @@ export default class PlayerControllerSystem extends EntitySystem {
 		const canJump = isGrounded || remainingCoyoteTime > 0;
 
 		// Handle jump input
-		if (InputSystem.instance.isPressed("w")) {
+		if (Engine.$.inputSystem.isPressed("w")) {
 			const forceSet = entity.getComponentSet(ForceComponentSet);
 
 			if (canJump || this.doubleJumpAllowed) {

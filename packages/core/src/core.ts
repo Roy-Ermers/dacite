@@ -1,4 +1,4 @@
-import { Scope } from "@dacite/ecs";
+import { Scope, type System } from "@dacite/ecs";
 import { TextureSource } from "pixi.js";
 import Time from "./Time";
 import InputSystem from "./systems/InputSystem";
@@ -7,17 +7,55 @@ import SpatialLookupSystem from "./systems/SpatialLookupSystem";
 
 interface EngineOptions {
 	canvas?: HTMLCanvasElement;
-	renderSystem?: RenderSystem;
+	systems?: System[];
 	debug?: boolean;
 }
 
 export default class Engine {
-	/* */
-	// biome-ignore lint: This will be defined in the constructor
-	public static instance: Engine = null!;
-	// biome-ignore lint: This will be defined in the constructor
-	renderSystem: RenderSystem = null!;
+	// biome-ignore lint: Should always be set.
+	protected static _currentEngine: Engine = null!;
 
+	static get $() {
+		return Engine._currentEngine;
+	}
+	private _renderSystem: WeakRef<RenderSystem> | null = null;
+	private _inputSystem: WeakRef<InputSystem> | null = null;
+
+	get renderSystem() {
+		const renderSystem = this._renderSystem?.deref();
+		if (renderSystem) {
+			return renderSystem;
+		}
+
+		const system = this.ecs.getSystem(RenderSystem);
+
+		if (!system)
+			throw new ReferenceError(
+				"Engine has no RenderSystem. Please add one using Engine.ecs.addSystem()"
+			);
+
+		this._renderSystem = new WeakRef(system);
+		return system;
+	}
+
+	get inputSystem() {
+		const inputSystem = this._inputSystem?.deref();
+		if (inputSystem) {
+			return inputSystem;
+		}
+
+		const system = this.ecs.getSystem(InputSystem);
+
+		if (!system)
+			throw new ReferenceError(
+				"Engine has no InputSystem. Please add one using Engine.ecs.addSystem()"
+			);
+
+		this._inputSystem = new WeakRef(system);
+		return system;
+	}
+
+	// biome-ignore lint: This will be defined in the constructor
 	// biome-ignore lint: This will be defined in the constructor
 	private _canvas: HTMLCanvasElement = null!;
 
@@ -34,13 +72,10 @@ export default class Engine {
 	public readonly ecs = new Scope();
 
 	constructor() {
-		if (Engine.instance) {
-			throw new Error("Game is already instantiated");
-		}
-
-		Engine.instance = this;
+		this.setEngineContext();
 
 		this._time = new Time(() => {
+			this.setEngineContext();
 			this.ecs.update();
 		});
 
@@ -54,21 +89,46 @@ export default class Engine {
 		globalThis.__ECS__ = this.ecs;
 	}
 
+	setEngineContext() {
+		Engine._currentEngine = this;
+	}
+
 	async init(options?: EngineOptions) {
 		if (options?.debug) {
 			console.log("Debug mode enabled");
 			this.ecs.eventbus.on("*", (...args) => console.log("⚡", ...args));
 		}
 
+		this.setEngineContext();
+
+		this.ecs.eventbus.on("beforesystemadded", () => this.setEngineContext());
+		this.ecs.eventbus.on("beforesystemremoved", () => this.setEngineContext());
+
 		this._canvas =
 			options?.canvas ??
 			document.body.appendChild(document.createElement("canvas"));
 
-		this.renderSystem = options?.renderSystem ?? new RenderSystem();
-
 		this.ecs
 			.addSystem(new InputSystem(this._canvas))
-			.addSystem(this.renderSystem)
 			.addSystem(new SpatialLookupSystem());
+
+		const systems = options?.systems ?? [new RenderSystem()];
+
+		for (const system of systems) {
+			this.ecs.addSystem(system);
+		}
+
+		const renderSystem = this.ecs.getSystem(RenderSystem);
+		if (renderSystem) {
+			this._renderSystem = new WeakRef(renderSystem);
+		} else {
+			this.ecs.addSystem(new RenderSystem());
+		}
 	}
 }
+
+Object.defineProperty(window, "__ENGINE__", {
+	get() {
+		return Engine.$;
+	}
+});

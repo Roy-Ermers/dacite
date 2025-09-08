@@ -1,13 +1,14 @@
 {
 	"name": "@dacite/playground",
 	"type": "module",
+	"private": true,
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@dacite/core": "^0.0.0",
+		"@dacite/core": "^0.2.0",
 		"@dacite/ecs-inspector": "*",
 		"pixi.js": "^8.6.6",
 		"tick-knock": "^4.3.0",

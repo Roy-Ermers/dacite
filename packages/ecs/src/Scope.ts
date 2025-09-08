@@ -57,8 +57,12 @@ export default class Scope {
 		componentadded: (entity: Entity<unknown>, component: ClassInstance) => void;
 		componentremoved: (
 			entity: Entity<unknown>,
-			component: ClassInstance
+			component: Type<unknown>
 		) => void;
+		beforesystemadded: (system: System) => void;
+		systemadded: (system: System) => void;
+		beforesystemremoved: (system: System) => void;
+		systemremoved: (system: System) => void;
 	}>();
 
 	public get world() {
@@ -74,6 +78,18 @@ export default class Scope {
 		}
 	}
 
+	public getNextEntityId() {
+		if (this.freeEntities.size > 0) {
+			const id = this.freeEntities.values().next().value;
+			if (id !== undefined) {
+				this.freeEntities.delete(id);
+				return id;
+			}
+		}
+
+		return this._currentID++;
+	}
+
 	/**
 	 * Creates a new entity with no name.
 	 * @returns the created entity.
@@ -86,7 +102,7 @@ export default class Scope {
 	 */
 	public entity(name: string): Entity;
 	public entity(name?: string) {
-		const entity = new Entity(this._currentID++, this);
+		const entity = new Entity(this.getNextEntityId(), this);
 
 		if (name) entity.name = name;
 
@@ -208,8 +224,11 @@ export default class Scope {
 	public addSystem(system: System) {
 		system.setScope(this);
 		this.systems.add(system);
+
+		this.eventbus.emit("beforesystemadded", system);
 		const onEnable = system.onEnable?.();
 
+		this.eventbus.emit("systemadded", system);
 		if (!System.hasUpdate(system)) {
 			return this;
 		}
@@ -243,8 +262,10 @@ export default class Scope {
 	public removeSystem(system: System) {
 		if (System.hasUpdate(system)) this.updatingSystems.delete(system);
 
+		this.eventbus.emit("beforesystemremoved", system);
 		system.onDisable?.();
 		system.setScope(null);
+		this.eventbus.emit("systemremoved", system);
 
 		this.systems.delete(system);
 	}

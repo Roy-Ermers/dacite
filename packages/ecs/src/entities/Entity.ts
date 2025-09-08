@@ -259,12 +259,20 @@ export default class Entity<S = unknown> {
 		}
 	}
 
-	*entries(): Generator<readonly [ComponentType, unknown], void, unknown> {
+	*entries(): Generator<
+		readonly [ComponentType<unknown>, unknown],
+		void,
+		unknown
+	> {
 		for (const [type, set] of this.scope.components) {
 			const component = set.get(this.id);
 
 			if (component) yield [type, set.get(this.id)] as const;
 		}
+	}
+
+	clone() {
+		return new Entity(this.id, this.scope);
 	}
 
 	[Symbol.toPrimitive](hint: "string" | "number" | "default") {

@@ -3,10 +3,6 @@ type EventDefinition = Record<string, EventHandler>;
 // biome-ignore lint: We don't care about the argument types.
 type EventHandler = (...args: any[]) => void;
 
-interface EventOptions {
-	once?: boolean;
-}
-
 /**
  * A simple event bus that allows you to listen for events and emit them.
  */
@@ -23,13 +19,13 @@ export default class EventBus<T extends EventDefinition> {
 	on<K extends keyof T>(event: K, listener: T[K]): () => void;
 	/**
 	 * Listen for all events
-	 * @param event alsways "*"
+	 * @param event always "*"
 	 * @param listener The listener to attach, first argument is the actual argument raised, and afterwards all arguments passed with it.
 	 * @returns A function that detaches the listener
 	 */
 	on<K extends keyof T>(
 		event: "*",
-		listener: (event: keyof K, ...args: unknown[]) => void
+		listener: (event: K, ...args: unknown[]) => void
 	): () => void;
 	on<K extends keyof T>(
 		event: K | "*",

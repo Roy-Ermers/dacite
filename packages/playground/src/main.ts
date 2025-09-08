@@ -6,7 +6,7 @@ import Engine, {
 	Transform,
 	Vector2
 } from "@dacite/core";
-import { PlanckPhysicsSystem, RenderSystem } from "@dacite/core/systems";
+import { PhysicsSystem } from "@dacite/core/systems";
 import createInspector from "@dacite/ecs-inspector";
 import { Sprite } from "pixi.js";
 import PlaneCollider from "../../core/src/components/colliders/PlaneCollider.ts";
@@ -20,21 +20,21 @@ import PlayerControllerSystem from "./systems/PlayerControllerSystem.ts";
 const game = new Engine();
 
 async function init() {
-	await game.init({
-		renderSystem: new RenderSystem({
-			backgroundColor: 0xffccaa
-		})
-	});
-
 	await Resources.load();
 
-	createInspector();
+	await game.init({
+		systems: [
+			new CameraSystem(),
+			new PlayerControllerSystem(),
+			new PhysicsSystem({ gravity: new Vector2(0, -9.78) }),
+			new HeartSystem()
+		]
+		// renderSystem: new RenderSystem({
+		// 	// backgroundColor: 0xffccaa
+		// })
+	});
 
-	game.ecs
-		.addSystem(new CameraSystem())
-		.addSystem(new PlayerControllerSystem())
-		.addSystem(new PlanckPhysicsSystem({ gravity: new Vector2(0, -9.78) }))
-		.addSystem(new HeartSystem());
+	createInspector();
 
 	createPlayer(game.ecs);
 
@@ -60,10 +60,7 @@ async function init() {
 			.set(new Renderable(balloon))
 			.set(new Rigidbody({ type: "dynamic" }))
 			.set(
-				new CircleCollider(4)
-					.withDensity(1)
-					.withFriction(1)
-					.withRestitution(0.75)
+				new CircleCollider(4).withDensity(1).withFriction(1).withRestitution(1)
 			);
 	}
 

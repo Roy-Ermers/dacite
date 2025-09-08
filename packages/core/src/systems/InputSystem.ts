@@ -1,12 +1,6 @@
 import { System } from "@dacite/ecs";
 
 export default class InputSystem extends System {
-	private static _instance: InputSystem;
-
-	public static get instance() {
-		return InputSystem._instance;
-	}
-
 	override get priority() {
 		return -1;
 	}
@@ -18,7 +12,6 @@ export default class InputSystem extends System {
 	constructor(target: EventTarget = window) {
 		super();
 
-		InputSystem._instance = this;
 		target.addEventListener("keydown", e =>
 			this.handleKeyDown(e as KeyboardEvent)
 		);
@@ -35,6 +28,7 @@ export default class InputSystem extends System {
 	}
 
 	private handleKeyDown(event: KeyboardEvent) {
+		event.preventDefault();
 		this.addKey(event.key.toLowerCase());
 
 		if (event.ctrlKey) this.addKey("ctrl");
@@ -47,6 +41,7 @@ export default class InputSystem extends System {
 	}
 
 	private handleKeyUp(event: KeyboardEvent) {
+		event.preventDefault();
 		this.pressedKeys.delete(event.key.toLowerCase());
 
 		if (!event.ctrlKey) this.pressedKeys.delete("ctrl");
@@ -56,8 +51,6 @@ export default class InputSystem extends System {
 		if (!event.metaKey) this.pressedKeys.delete("meta");
 
 		if (!event.altKey) this.pressedKeys.delete("alt");
-
-		event.preventDefault();
 	}
 
 	private addKey(key: string) {

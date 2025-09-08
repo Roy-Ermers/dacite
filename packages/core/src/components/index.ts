@@ -10,3 +10,4 @@ export { default as Renderable } from "./Renderable";
 export { default as Rigidbody } from "./Rigidbody";
 export { default as TileMapRenderer } from "./TileMapRenderer";
 export { default as Transform } from "./Transform";
+export { default as Camera, ActiveCamera } from "./Camera";

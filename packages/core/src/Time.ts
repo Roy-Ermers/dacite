@@ -31,12 +31,16 @@ export default class Time {
 			this._startTime = time;
 		}
 
-		requestAnimationFrame(this.update.bind(this));
+		const handle = requestAnimationFrame(this.update.bind(this));
 		if (this._lastTime !== undefined) {
 			this._deltaTime = Math.min(1 / 10, time - this._lastTime);
 		}
-
-		this._callback();
+		try {
+			this._callback();
+		} catch (e) {
+			cancelAnimationFrame(handle);
+			throw e;
+		}
 
 		this._lastTime = time;
 	}

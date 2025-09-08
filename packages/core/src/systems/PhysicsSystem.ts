@@ -1,26 +1,35 @@
-import { type Entity, EntitySystem, Query } from "@dacite/ecs";
-import { Body, type BodyOptions, Box, Circle, Plane, World } from "p2-es";
-import { BoxCollider, CircleCollider, Collider } from "../components";
+import {
+	type Entity,
+	EntitySystem,
+	type InferQuerySet,
+	Query
+} from "@dacite/ecs";
+import {
+	type Body,
+	BoxShape,
+	CircleShape,
+	EdgeShape,
+	Settings,
+	type Shape,
+	World
+} from "planck";
+import type { Contact as PhysicsContact } from "planck";
 import { ForceComponentSet } from "../components/Force.ts";
-import Rigidbody, { type RigidbodyType } from "../components/Rigidbody.ts";
+import Rigidbody from "../components/Rigidbody.ts";
 import Transform from "../components/Transform.ts";
 import PlaneCollider from "../components/colliders/PlaneCollider.ts";
+import {
+	BoxCollider,
+	CircleCollider,
+	Collider,
+	Contact,
+	ContactComponentSet
+} from "../components/index.ts";
 import Engine from "../index.ts";
-import type Vector2 from "../utils/Vector2";
-
-const TYPE_MAP: Record<RigidbodyType, 1 | 2 | 4> = {
-	dynamic: Body.DYNAMIC,
-	static: Body.STATIC,
-	kinematic: Body.KINEMATIC
-} as const;
+import Vector2 from "../utils/Vector2.ts";
 
 interface PhysicsSystemOptions {
 	gravity?: Vector2;
-	/**
-	 * Defines how much pixels are a meter
-	 * @default 16
-	 */
-	scale?: number;
 	defaults?: {
 		/**
 		 * The default damping value for rigidbodies.
@@ -44,129 +53,160 @@ interface PhysicsSystemOptions {
 
 export default class PhysicsSystem extends EntitySystem {
 	get query() {
-		return new Query().has(Rigidbody).has(Collider);
+		return new Query().has(Collider).has(Transform);
 	}
 
 	physicsWorld: World;
-	fixedTimeStep: number = 1 / 60;
-	scale: number;
-	bodyLookup = new WeakMap<Rigidbody, Body>();
-
-	defaultRigidbodyOptions: BodyOptions;
+	fixedTimeStep = 1;
+	bodies = new Map<number, Body>();
 
 	constructor(options: PhysicsSystemOptions = {}) {
 		super();
 		this.physicsWorld = new World({
-			gravity: options.gravity ? [...options.gravity] : [0, 0],
-			islandSplit: true
+			gravity: options.gravity,
+			allowSleep: true
 		});
+		this.physicsWorld.on("begin-contact", contact =>
+			this.onContactStart(contact)
+		);
+		this.physicsWorld.on("end-contact", contact => this.onContactEnd(contact));
 
-		this.scale = options.scale ?? 16;
-
-		this.defaultRigidbodyOptions = {
-			type: TYPE_MAP.dynamic,
-			damping: options.defaults?.damping ?? 0.1,
-			angularDamping: options.defaults?.angularDamping ?? 0.1,
-			mass: options.defaults?.mass ?? 0
-		};
+		Settings.lengthUnitsPerMeter = 16;
 	}
 
 	override update(): void {
-		this.physicsWorld.step(
-			this.fixedTimeStep,
-			Engine.instance.time.deltaTime,
-			10
-		);
+		this.physicsWorld.step(this.fixedTimeStep * Engine.$.time.deltaTime);
 		super.update();
 	}
 
-	protected override onEntityUpdated(entity: Entity) {
+	private onContactStart(contact: PhysicsContact) {
+		const component = new Contact(contact, this.scope);
+		const a = component.A.value;
+		const b = component.B.value;
+
+		const addContact = (entity: Entity, contact: Contact) => {
+			const contacts = entity.getComponentSet(ContactComponentSet);
+
+			contacts.add(contact);
+		};
+
+		if (a) addContact(a, component);
+		if (b) addContact(b, component);
+	}
+
+	private onContactEnd(contact: PhysicsContact) {
+		const a = Contact.findEntity(contact.getFixtureA(), this.scope);
+		const b = Contact.findEntity(contact.getFixtureB(), this.scope);
+
+		const removeContact = (entity: Entity) => {
+			const contacts = entity.get(ContactComponentSet);
+
+			if (!contacts) return;
+			const existingContact = contacts.find(x => x.equals(contact));
+			if (!existingContact) return;
+
+			contacts.delete(existingContact);
+		};
+
+		if (a) removeContact(a);
+		if (b) removeContact(b);
+	}
+
+	protected override onEntityUpdated(
+		entity: Entity<InferQuerySet<this["query"]>>
+	) {
 		const rigidbody = entity.get(Rigidbody);
 		const transform = entity.get(Transform);
-		if (!rigidbody?.body || !transform) {
-			console.log("no rigidbody or transform", rigidbody, transform);
-			return;
-		}
 
+		const body = this.bodies.get(entity.id);
+
+		if (!body || !rigidbody) return;
 		const forces = entity.get(ForceComponentSet);
+
+		const center = body.getWorldCenter();
 
 		if (forces) {
 			for (const force of forces) {
 				if (force.type === "force")
-					rigidbody.body.applyForce([...force.direction]);
+					body.applyForce(force.direction, force.point ?? center);
 				if (force.type === "impulse")
-					rigidbody.body.applyImpulse([...force.direction]);
-
-				forces?.delete(force);
+					body.applyLinearImpulse(force.direction, force.point ?? center);
+				forces.delete(force);
 			}
 		}
 
-		transform.position.x = rigidbody.body.interpolatedPosition[0] * this.scale;
-		transform.position.y = -rigidbody.body.interpolatedPosition[1] * this.scale;
-		transform.rotation = rigidbody.body.interpolatedAngle;
+		const velocity = body.getLinearVelocity();
+		rigidbody._velocity.x = velocity.x;
+		rigidbody._velocity.y = velocity.y;
+
+		const position = body.getPosition();
+		transform.position.x = position.x;
+		transform.position.y = -position.y;
+
+		transform.rotation = body.getAngle();
 	}
 
 	private addColliders(entity: Entity, body: Body) {
 		const collider = entity.get(Collider);
+		const transform = entity.get(Transform);
+
+		if (!transform) return;
+
+		let shape: Shape;
 
 		if (collider instanceof BoxCollider) {
-			const boxShape = new Box({
-				width: collider.width / this.scale,
-				height: collider.height / this.scale
-			});
-
-			body.addShape(boxShape);
+			shape = new BoxShape(collider.width / 2, collider.height / 2);
 		} else if (collider instanceof CircleCollider) {
-			const circleShape = new Circle({
-				radius: collider.radius / this.scale
-			});
-
-			body.addShape(circleShape);
+			shape = new CircleShape(Vector2.zero, collider.radius);
 		} else if (collider instanceof PlaneCollider) {
-			const plane = new Plane();
-
-			body.addShape(plane);
+			shape = new EdgeShape(collider.start, collider.end);
+		} else {
+			console.warn("Unknown collider type: ", collider);
+			return;
 		}
+
+		body.createFixture({
+			shape,
+			density: collider.density,
+			friction: collider.friction,
+			restitution: collider.restitution,
+			isSensor: collider.isSensor,
+			userData: entity.id
+		});
 	}
 
-	protected override onEntityAdded(entity: Entity): void {
+	protected override onEntityAdded(
+		entity: Entity<InferQuerySet<this["query"]>>
+	): void {
 		const rigidbody = entity.get(Rigidbody);
 		const transform = entity.get(Transform);
 
-		if (!transform || !rigidbody) return;
+		const type = rigidbody?.type ?? "static";
 
-		let type = this.defaultRigidbodyOptions.type;
-
-		if (rigidbody.type) {
-			type = TYPE_MAP[rigidbody.type];
-		}
-
-		const body = new Body({
-			position: [
-				transform.position.x / this.scale,
-				transform.position.y / this.scale
-			],
-			...this.defaultRigidbodyOptions,
-			damping: rigidbody.damping ?? this.defaultRigidbodyOptions.damping,
-			mass: rigidbody.mass ?? this.defaultRigidbodyOptions.mass,
-			fixedRotation:
-				rigidbody.fixedRotation ?? this.defaultRigidbodyOptions.fixedRotation,
-			type
+		const body = this.physicsWorld.createBody({
+			type,
+			position: transform.position,
+			angle: transform.rotation,
+			fixedRotation: rigidbody?.fixedRotation,
+			linearDamping: rigidbody?.damping,
+			userData: entity.id
 		});
 
 		this.addColliders(entity, body);
 
-		this.physicsWorld.addBody(body);
-		this.bodyLookup.set(rigidbody, body);
-
-		rigidbody.body = body;
+		this.bodies.set(entity.id, body);
 	}
 
-	protected override onEntityRemoved(entity: Entity): void {
+	protected override onEntityRemoved(
+		entity: Entity<InferQuerySet<this["query"]>>
+	): void {
 		const rigidbody = entity.get(Rigidbody);
-		if (!rigidbody?.body) return;
 
-		this.bodyLookup.delete(rigidbody);
-		this.physicsWorld.removeBody(rigidbody.body);
+		if (!rigidbody) return;
+
+		const body = this.bodies.get(entity.id);
+		if (!body) return;
+		this.bodies.delete(entity.id);
+		this.physicsWorld.destroyBody(body);
 	}
 }

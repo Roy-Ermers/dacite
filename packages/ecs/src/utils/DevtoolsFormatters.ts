@@ -1,6 +1,7 @@
 import ComponentSet from "../components/ComponentSet";
 import Entity from "../entities/Entity";
 import getComponentName from "./getComponentName";
+
 declare global {
 	interface CustomFormatter {
 		header: (obj: unknown) => JSONML | null;
@@ -103,7 +104,8 @@ class EntityFormatter implements CustomFormatter {
 	}
 }
 
-window.devtoolsFormatters = [
-	new ComponentSetFormatter(),
-	new EntityFormatter()
-];
+if ("window" in globalThis)
+	window.devtoolsFormatters = [
+		new ComponentSetFormatter(),
+		new EntityFormatter()
+	];

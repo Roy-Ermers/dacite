@@ -46,7 +46,7 @@ export default abstract class EntitySystem extends System {
 		const removeComponent = this.scope.eventbus.on(
 			"componentremoved",
 			(entity: Entity) => {
-				if (this.query.matches(entity)) return;
+				if (!this.query.matches(entity)) return;
 				this._entities.delete(entity.id);
 				this.onEntityRemoved?.(entity);
 			}
@@ -55,6 +55,7 @@ export default abstract class EntitySystem extends System {
 		const entityDestroyed = this.scope.eventbus.on(
 			"entitydestroyed",
 			(entity: Entity) => {
+				if (!this.query.matches(entity)) return;
 				this._entities.delete(entity.id);
 				this.onEntityRemoved?.(entity);
 			}

@@ -14,7 +14,7 @@ export default class HeartSystem extends EntitySystem {
 	heartFilled: Sprite;
 
 	override get query() {
-		return new Query().has(ContactComponentSet).has(Renderable).has(HEART);
+		return new Query().has(HEART).has(ContactComponentSet).has(Renderable);
 	}
 
 	constructor() {

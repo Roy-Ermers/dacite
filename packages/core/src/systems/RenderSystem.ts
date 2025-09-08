@@ -1,4 +1,9 @@
-import Engine, { Renderable, Transform } from "@dacite/core";
+import Engine, {
+	ActiveCamera,
+	Camera,
+	Renderable,
+	Transform
+} from "@dacite/core";
 import {
 	type Entity,
 	EntitySystem,
@@ -22,6 +27,13 @@ export default class RenderSystem extends EntitySystem {
 	private renderOptions: Partial<AutoDetectOptions>;
 	private observer: ResizeObserver;
 
+	private cameras = new Query().has(ActiveCamera).has(Transform).has(Camera);
+
+	private _activeCamera: Entity<Transform & Camera> | null | null = null;
+	public get activeCamera() {
+		return this._activeCamera;
+	}
+
 	override get priority() {
 		return -1;
 	}
@@ -39,7 +51,7 @@ export default class RenderSystem extends EntitySystem {
 	override async onEnable() {
 		await super.onEnable();
 
-		this.canvas = Engine.instance.canvas;
+		this.canvas = Engine.$.canvas;
 		this.canvas.tabIndex = 0;
 		this.canvas.focus();
 
@@ -73,7 +85,26 @@ export default class RenderSystem extends EntitySystem {
 
 	override update() {
 		super.update();
+
+		this._activeCamera = this.cameras.first(this.scope);
+
 		this.renderer.render({ container: this.scene });
+
+		if (!this._activeCamera) {
+			console.error(
+				"Could not find Camera. Please add one using Engine.entity('camera').set(new Camera()).set(ActiveCamera)"
+			);
+			return;
+		}
+
+		const { position, rotation } = this._activeCamera.get(Transform);
+		const { zoom } = this._activeCamera.get(Camera);
+		this.scene.position.set(
+			this.canvas.clientWidth / 2 - position.x * zoom,
+			this.canvas.clientHeight / 2 - position.y * zoom
+		);
+		this.scene.rotation = rotation;
+		this.scene.scale.set(zoom);
 	}
 
 	protected override onEntityAdded(
@@ -89,6 +120,8 @@ export default class RenderSystem extends EntitySystem {
 	protected override onEntityRemoved(
 		entity: Entity<InferQuerySet<this["query"]>>
 	) {
+		console.log(entity.getAll());
+
 		const renderable = entity.get(Renderable);
 		this.scene.removeChild(renderable.container);
 	}

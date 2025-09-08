@@ -9,5 +9,11 @@
 		"reveal": "no_focus",
 		"hide": "on_success",
 		"shell": "system"
+	},
+	{
+		"label": "Run vitest",
+		"command": "npx vitest run",
+		"args": ["\"$ZED_RELATIVE_FILE\" -t=\"$ZED_SYMBOL\""],
+		"tags": ["tsx-test", "ts-test"]
 	}
 ]

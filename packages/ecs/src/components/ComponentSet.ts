@@ -80,7 +80,7 @@ export default class ComponentSet<T extends ClassInstance = object> {
 
 	delete(component: T) {
 		const index = this.components.findIndex(x => x === component);
-		const [deletedComponent] = this.components.splice(index, 1);
+		this.components.splice(index, 1);
 	}
 
 	find(predicate: (value: T) => boolean) {
